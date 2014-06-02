@@ -5,13 +5,13 @@ SRCDIR  := $(CURDIR)/src
 INCLUDE := -I $(CURDIR)/include
 OBJDIR  := $(CURDIR)/obj
 
-SRC     := $(SRCDIR)/floyd.c $(SRCDIR)/MyMPI.c
+SRC     := $(SRCDIR)/circuit.c $(SRCDIR)/MyMPI.c
 OBJ     := $(patsubst %.c,$(OBJDIR)/%.c.o,$(notdir $(SRC)))
 LIB     := 
 CFLAGS  := 
 DEBUG   := 
 
-EXEC    := $(CURDIR)/floyd
+EXEC    := $(CURDIR)/circuit
 
 MPICC   := /opt/local/bin/mpicc-openmpi-mp
 CC      := $(shell $(MPICC) --showme:command)
@@ -32,11 +32,3 @@ makedirectories:
 
 clean:
 	$(VERBOSE) rm -rf $(OBJDIR) $(EXEC)
-# floyd: floyd.o MyMPI.o
-#	mpicc -o floyd floyd.o MyMPI.o
-# floyd.o:
-# 	mpicc -c floyd.c
-# MyMPI.o:
-# 	mpicc -c MyMPI.c
-# clean:
-# 	rm floyd floyd.o MyMPI.o 
