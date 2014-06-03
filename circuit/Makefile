@@ -1,4 +1,5 @@
 
+SHELL   := /bin/bash
 CURDIR  := $(shell pwd)
 
 SRCDIR  := $(CURDIR)/src
@@ -13,13 +14,17 @@ DEBUG   :=
 
 EXEC    := $(CURDIR)/circuit
 
-MPICC   := /opt/local/bin/mpicc-openmpi-mp
+MPICC   := $(shell which mpicc) # /opt/local/bin/mpicc-openmpi-mp
+MPIRUN  := $(shell which mpirun)
 CC      := $(shell $(MPICC) --showme:command)
 # ARCH    := -arch x86_64
 CFLAGS  := $(shell $(MPICC) --showme:compile)
 LDFLAGS := $(shell $(MPICC) --showme:link)
 
 make_exec: makedirectories $(EXEC)
+
+run:
+	$(MPIRUN) -np 2 $(EXEC) 
 
 $(EXEC): $(SRC) $(OBJ)
 	$(VERBOSE) $(CC) $(LIB) $(LDFLAGS) $(OBJ) -o $@
