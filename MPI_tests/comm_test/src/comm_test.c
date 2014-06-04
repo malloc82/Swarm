@@ -3,12 +3,17 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+#include <string.h>
 
 void schedule(const int id, const int p) 
 {
     switch(id) {
         case 0:  
-            monitor(id, p); 
+            /* monitor(id, p);  */
+            receiver_test(id, p);
+            break;
+        case 1:
+            sender_test(id, p);
             break;
         default: 
             worker(id); 
@@ -43,6 +48,41 @@ int worker(const int id)
     MPI_Send(&data, 1, MPI_INT, 0, id, MPI_COMM_WORLD);
     printf("\n<<<<<<<< node %d: data sent\n\n", id);
     return id;
+}
+
+int receiver_test(const int id, const int p)
+{
+    char data[50]; 
+    MPI_Status status;
+    puts("zzzzzzzzzz: reciever delay");
+    sleep(5);
+    puts("woooooooow: receiver wake up");
+
+    MPI_Recv(&data, 50, MPI_CHAR, 1, 2, MPI_COMM_WORLD, &status);
+    printf("Receiver: data(2) = %s\n", data);
+
+    MPI_Recv(&data, 50, MPI_CHAR, 1, 1, MPI_COMM_WORLD, &status);
+    printf("Receiver: data(1) = %s\n", data);
+
+    MPI_Recv(&data, 50, MPI_CHAR, 1, 0, MPI_COMM_WORLD, &status);
+    printf("Receiver: data(0) = %s\n", data);
+    
+    return 0;
+}
+
+int sender_test(const int id, const int p) 
+{
+    const char * msg1 = " message 1";
+    const char * msg2 = " message 2    ";
+    const char * msg3 = "   third message ";
+
+    MPI_Send((void *)msg1, strlen(msg1) + 1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+    MPI_Send((void *)msg2, strlen(msg2) + 1, MPI_CHAR, 0, 1, MPI_COMM_WORLD);
+    MPI_Send((void *)msg3, strlen(msg3) + 1, MPI_CHAR, 0, 2, MPI_COMM_WORLD);
+    
+    puts("# # # # #   sender done.");
+
+    return 0;
 }
 
 int main(int argc, char *argv[])
