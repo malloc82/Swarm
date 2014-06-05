@@ -5,23 +5,6 @@
 #include <unistd.h>
 #include <string.h>
 
-void schedule(const int id, const int p) 
-{
-    switch(id) {
-        case 0:  
-            /* monitor(id, p);  */
-            receiver_test(id, p);
-            break;
-        case 1:
-            sender_test(id, p);
-            break;
-        default: 
-            worker(id); 
-            break;
-    }
-    return;
-}
-
 int monitor(const int id, const int p) 
 {
     int i;
@@ -52,20 +35,38 @@ int worker(const int id)
 
 int receiver_test(const int id, const int p)
 {
+    int i;
     char data[50]; 
+    short channels[3] = {0, 0, 0};
+    int done = 0;
     MPI_Status status;
+    int timeout = 12000; /* in ms */
+    
     puts("zzzzzzzzzz: reciever delay");
     sleep(5);
     puts("woooooooow: receiver wake up");
-
-    MPI_Recv(&data, 50, MPI_CHAR, 1, 2, MPI_COMM_WORLD, &status);
-    printf("Receiver: data(2) = %s\n", data);
-
-    MPI_Recv(&data, 50, MPI_CHAR, 1, 1, MPI_COMM_WORLD, &status);
-    printf("Receiver: data(1) = %s\n", data);
-
-    MPI_Recv(&data, 50, MPI_CHAR, 1, 0, MPI_COMM_WORLD, &status);
-    printf("Receiver: data(0) = %s\n", data);
+    clock_t start_time = clock(), diff = 0;
+    while (done < 3) {
+        if (diff > timeout) {
+            puts("timeout ... ");
+            break;
+        }
+        for (i = 0; i < 3; ++i) {
+            if (channels[i] == 0) {
+                int flag = 0;
+                MPI_Status status;
+                MPI_Iprobe(1, i, MPI_COMM_WORLD, &flag, &status);
+                if (flag) {
+                    MPI_Recv(&data, 50, MPI_CHAR, 1, i, MPI_COMM_WORLD, &status);
+                    channels[i] = 1;
+                    ++done;
+                    printf("Receiver: data[%d] = %s\n", i, data);
+                }
+            }
+        }
+        /* printf("channel status: %d, %d, %d\n", channels[0], channels[1], channels[2]); */
+        diff = (clock() - start_time) * 1000 / CLOCKS_PER_SEC;
+    }
     
     return 0;
 }
@@ -75,8 +76,10 @@ int sender_test(const int id, const int p)
     const char * msg1 = " message 1";
     const char * msg2 = " message 2    ";
     const char * msg3 = "   third message ";
-
     MPI_Send((void *)msg1, strlen(msg1) + 1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+    printf("\n<<<<<<<<<<<< sender sleep \n\n");
+    sleep(10);
+    printf("\n<<<<<<<<<<<< sender wake up \n\n");
     MPI_Send((void *)msg2, strlen(msg2) + 1, MPI_CHAR, 0, 1, MPI_COMM_WORLD);
     MPI_Send((void *)msg3, strlen(msg3) + 1, MPI_CHAR, 0, 2, MPI_COMM_WORLD);
     
@@ -84,6 +87,24 @@ int sender_test(const int id, const int p)
 
     return 0;
 }
+
+void schedule(const int id, const int p) 
+{
+    switch(id) {
+        case 0:  
+            /* monitor(id, p);  */
+            receiver_test(id, p);
+            break;
+        case 1:
+            sender_test(id, p);
+            break;
+        default: 
+            worker(id); 
+            break;
+    }
+    return;
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -99,7 +120,7 @@ int main(int argc, char *argv[])
     diff = clock() - start;
     double msc = diff * 1000/CLOCKS_PER_SEC;
     if (id == 0) {
-        printf(" ******* Initialization too %f ms *******\n", diff);
+        printf(" ******* Initialization took %f ms *******\n", diff);
     }
     
     printf("after init: id = %d, p %d \n", id, p);
