@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
         printf("%lf, ", v[i]);
     }
     puts("\n");
-    
+    free(v);
+
     return 0;
 }

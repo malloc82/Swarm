@@ -53,6 +53,7 @@ int randrange_array(const double * lo,
     for (i = 0; i < len; ++i) {
         (*dest)[i] = lo[i] + (hi[i] - lo[i])*((double)rand_vals[i]/UINT_MAX);
     }
+    free(rand_vals);
     return 0;
 }
 
