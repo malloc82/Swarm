@@ -22,14 +22,6 @@ function [best_val best_pos] = swarm_run(fn, dim_range, agent_count, std_thresho
     
     v_max_hist = [];
     
-    % ackley_fn = mk_ackley(20, 0.2, 2*pi);
-    % [swarm agents_update] = mk_swarm(ackley_fn, 1, 1, 2);
-
-    % michalewicz = mk_michalewicz(10);
-    % [swarm agents_update] = mk_swarm(michalewicz, 1, 1, 2);
-
-    % [swarm agents_update] = mk_swarm(@rastrigin, 1, 1, 2);
-    
     [swarm agents_update] = mk_swarm(fn, 1, 1, 2);
     
     pos = shuffle_pos(dim_range, agent_count);
@@ -124,7 +116,7 @@ function [best_val best_pos] = swarm_run(fn, dim_range, agent_count, std_thresho
             
             M(i) = getframe;
             hold off
-        end 
+        end % visualization end
 
         if mean(curr_std) < std_threshold
             % msg = 'done'
