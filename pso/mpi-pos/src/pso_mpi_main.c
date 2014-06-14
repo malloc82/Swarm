@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
             case 'd':
                 errno = 0; 
                 dimension = strtol(optarg, &endptr, 10);
-                if ((errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)) 
+                if ((errno == ERANGE && (dimension == LONG_MAX || dimension == LONG_MIN)) 
                     || (errno != 0 && dimension = 0)) {
                     perror("strtol");
                     MPI_Finalize();
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
             case 'n':
                 errno = 0; 
                 agents_count = strtol(optarg, &endptr, 10);
-                if ((errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)) 
+                if ((errno == ERANGE && (agents_count == LONG_MAX || agents_count == LONG_MIN)) 
                     || (errno != 0 && agents_count = 0)) {
                     perror("strtol");
                     MPI_Finalize();
