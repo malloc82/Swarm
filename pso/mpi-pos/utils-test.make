@@ -12,7 +12,7 @@ TESTSRC := $(TESTDIR)/utils_test.c
 OBJ     := $(patsubst %.c,$(OBJDIR)/%.c.o,$(notdir $(SRC)))
 OBJ     += $(patsubst %.c,$(OBJDIR)/%.c.o,$(notdir $(TESTSRC)))
 LIB     := -lm
-DEBUG   := 
+DEBUG   := -g
 
 EXEC    := $(CURDIR)/utils-test
 

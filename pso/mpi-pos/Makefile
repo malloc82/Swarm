@@ -11,8 +11,10 @@ INCLUDE := -I $(CURDIR)/include
 
 # variables for compiling sequential code
 SEQ_SRC := $(SRCDIR)/pso_seq_main.c \
+		   $(SRCDIR)/search.c \
 		   $(SRCDIR)/functions.c \
-		   $(SRCDIR)/utils.c
+		   $(SRCDIR)/utils.c \
+		   $(TESTDIR)/test_fns.c
 
 SEQ_OBJDIR := $(CURDIR)/obj_seq
 SEQ_OBJ    := $(patsubst %.c,$(SEQ_OBJDIR)/%.c.o,$(notdir $(SEQ_SRC)))
@@ -37,7 +39,7 @@ MPI_EXEC    := $(CURDIR)/pso_mpi
 
 # Debugging flag
 
-DEBUG := 
+DEBUG := -g
 
 compile_seq: makedirectories $(SEQ_EXEC)
 

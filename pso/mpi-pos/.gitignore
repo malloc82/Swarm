@@ -2,3 +2,8 @@
 pso_seq
 ackley
 utils-test
+
+# object directory
+obj/*
+seq_obj/*
+mpi_obj/*

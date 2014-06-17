@@ -1,35 +1,26 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "pso.h"
+#include "test_fns.h"
 #include <errno.h>
-#include <unistd.h>
-#include <limits.h>
-
-typedef struct {
-    unsigned int dimension;
-    unsigned int agents_count;
-    double precision;
-} PSO_parameters; 
 
 
 int main(int argc, char *argv[])
 {
     int id = -1;
     int p  = 0;
-    int c; 
+    int c;
     char * endptr;
     int words_read = 0;
-    
+
     PSO_parameters parameters = {0, 0, 0.01};
 
-    while ((c = getopt(argc, argv, "d:n:")) != -1) { 
+    while ((c = getopt(argc, argv, "d:n:")) != -1) {
         switch (c) {
             case 'd': /* dimension */
-                errno = 0; 
+                errno = 0;
                 parameters.dimension = strtol(optarg, &endptr, 10);
-                if ((errno == ERANGE && 
-                     (parameters.dimension == LONG_MAX || 
-                      parameters.dimension == LONG_MIN)) 
+                if ((errno == ERANGE &&
+                     (parameters.dimension == LONG_MAX ||
+                      parameters.dimension == LONG_MIN))
                     || (errno != 0 && parameters.dimension == 0)) {
                     perror("strtol: d");
                     exit(EXIT_FAILURE);
@@ -40,10 +31,10 @@ int main(int argc, char *argv[])
                 }
                 break;
             case 'n': /* agents count */
-                errno = 0; 
+                errno = 0;
                 parameters.agents_count = strtol(optarg, &endptr, 10);
-                if ((errno == ERANGE && 
-                     (parameters.agents_count == LONG_MAX || 
+                if ((errno == ERANGE &&
+                     (parameters.agents_count == LONG_MAX ||
                       parameters.agents_count == LONG_MIN))
                     || (errno != 0 && parameters.agents_count == 0)) {
                     perror("strtol: n");
@@ -69,7 +60,7 @@ int main(int argc, char *argv[])
         puts("Missing either dimension or agents_count, cannot proceed.");
         exit(EXIT_FAILURE);
     }
-    
+
     printf("**********************************\n");
     printf(" Starting parameters: \n\n");
     printf("  agents count = %d\n", parameters.agents_count);
@@ -78,8 +69,20 @@ int main(int argc, char *argv[])
     printf("**********************************\n");
 
     /* unsigned int local_agents_count = (unsigned int)ceil(agents_count / (double)p); */
-    
+
+    printf("**********************************\n");
+    printf(" funcall test: \n\n");
+    printf("    test call ret val = %f\n", funcall_test(ackley, NULL));
+    printf("**********************************\n");
+
+    printf("**********************************\n");
+    printf(" start search : \n\n");
+    PSO_range range  = {-5, 5};
+    PSO_state * result = pso_search(ackley, &range, &parameters);
+    printf("   pso search result = %lf\n", result->val);
+    printf("**********************************\n");
+
+    /* release heap */ 
+    result = reset_state(result);
     return 0;
 }
-
-
