@@ -3,6 +3,6 @@ function v_max = new_v_max(pos, dim, curr_v_max)
     if nargin == 3
         if v_max > curr_v_max
             v_max = curr_v_max;
-        end 
-    end 
+        end
+    end
 end

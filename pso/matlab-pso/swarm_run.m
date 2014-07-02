@@ -2,16 +2,16 @@ function [best_val best_pos] = swarm_run(fn, dim_range, agent_count, std_thresho
     function v = v_max_fn(s)
         if s > 1
             v = log(s + 1);
-        else 
+        else
             v = log(s^2 + 1);
-        end 
-    end 
+        end
+    end
     debug = 0;
     g_ratio = (3-sqrt(5))/2;
     ratio = 0.1;
     [dim, ~] = size(dim_range);
 
-    % bins = zeros(1, (range(2) - range(1))); %% ? 
+    % bins = zeros(1, (range(2) - range(1))); %% ?
     x_pos_std = [];
     x_pos_std_avg = [];
     x_pos_std_slope = [];
@@ -19,38 +19,38 @@ function [best_val best_pos] = swarm_run(fn, dim_range, agent_count, std_thresho
     y_pos_std = [];
     y_pos_std_avg = [];
     y_pos_std_slope = [];
-    
+
     v_max_hist = [];
-    
+
     [swarm agents_update] = mk_swarm(fn, 1, 1, 2);
-    
+
     pos = shuffle_pos(dim_range, agent_count);
     if nargin < 5
         v_max = norm(arrayfun(@(d) v_max_fn(std(pos(d, :))), (1:dim)));
         % v_max = norm(arrayfun(@(d) (std(pos(d, :))/27)^(1/3), (1:dim)));
-    end 
+    end
     base_std = zeros(1, dim);
     for d=1:dim
         base_std(d) = std(pos(d, :));
-    end 
+    end
     % v_max
     v = init_v(dim_range, agent_count, v_max);
     best_val_hist = [];
     i = 0;
-    
+
     plot_row = 2;
     plot_col = 2;
-    
+
     curr_std = base_std;
     for i=1:100
         % compute standard deviation for each division
         for d=1:dim
             curr_std(d) = std(pos(d, :));
         end
-        
+
         % visualizing
         if debug == 1 && dim <= 2
-            % plot positions 
+            % plot positions
             subplot(plot_row, plot_col, 1);
             scatter([dim_range(1,1) dim_range(1,2)], ...
                     [dim_range(2,1) dim_range(2,2)], '.');
@@ -58,15 +58,15 @@ function [best_val best_pos] = swarm_run(fn, dim_range, agent_count, std_thresho
             scatter(pos(1, :), pos(2, :), 'b');
             if i > 1
                 scatter(best_pos(1), best_pos(2), 'x');
-            end 
+            end
             hold off
-            
-            % tracking best_val 
+
+            % tracking best_val
             subplot(plot_row, plot_col, 2);
             % plot((1:length(best_val_hist)), best_val_hist);
             v_max_hist = [v_max_hist v_max];
             plot((1:length(v_max_hist)), v_max_hist);
-            
+
             subplot(plot_row, plot_col, 3);
             % x_pos_std = [x_pos_std std(pos_bins(1, :))];
             x_pos_std = [x_pos_std curr_std(1)];
@@ -75,22 +75,22 @@ function [best_val best_pos] = swarm_run(fn, dim_range, agent_count, std_thresho
                 x_pos_std_avg = [x_pos_std_avg mean(x_pos_std(end-4:end))];
                 if i > 6
                     x_pos_std_slope = [x_pos_std_slope x_pos_std_avg(end) - x_pos_std_avg(end-1)];
-                else 
+                else
                     x_pos_std_slope = [x_pos_std_slope -1];
-                end 
+                end
 
                 plot((1:length(x_pos_std)), x_pos_std, 'b', ...
                      (1:length(x_pos_std_slope)), x_pos_std_slope, 'g');
                 % plot((1:length(x_pos_std)), x_pos_std, 'b', ...
                 %      (1:length(x_pos_std_avg)), x_pos_std_avg, 'r', ...
                 %      (1:length(x_pos_std_slope)), x_pos_std_slope, 'g');
-            else 
+            else
                 x_pos_std_avg = [x_pos_std_avg x_pos_std(end)];
                 plot((1:length(x_pos_std)), x_pos_std, 'b')
                 % plot((1:length(x_pos_std)), x_pos_std, 'b', ...
                 %      (1:length(x_pos_std_avg)), x_pos_std_avg, 'r');
-            end 
-            
+            end
+
             subplot(plot_row, plot_col, 4);
             % y_pos_std = [y_pos_std std(pos_bins(2, :))];
             y_pos_std = [y_pos_std curr_std(2)];
@@ -99,21 +99,21 @@ function [best_val best_pos] = swarm_run(fn, dim_range, agent_count, std_thresho
                 y_pos_std_avg = [y_pos_std_avg mean(y_pos_std(end-4:end))];
                 if i > 6
                     y_pos_std_slope = [y_pos_std_slope y_pos_std_avg(end) - y_pos_std_avg(end-1)];
-                else 
+                else
                     y_pos_std_slope = [y_pos_std_slope -1];
-                end 
+                end
                 plot((1:length(y_pos_std)), y_pos_std, 'b', ...
                      (1:length(x_pos_std_slope)), x_pos_std_slope, 'g');
                 % plot((1:length(y_pos_std)), y_pos_std, 'b', ...
                 %      (1:length(y_pos_std_avg)), y_pos_std_avg, 'r', ...
                 %      (1:length(x_pos_std_slope)), x_pos_std_slope, 'g');
-            else 
+            else
                 y_pos_std_avg = [y_pos_std_avg y_pos_std(end)];
                 plot((1:length(y_pos_std)), y_pos_std, 'b')
                 % plot((1:length(y_pos_std)), y_pos_std, 'b', ...
                 %      (1:length(y_pos_std_avg)), y_pos_std_avg, 'r');
-            end 
-            
+            end
+
             M(i) = getframe;
             hold off
         end % visualization end
@@ -121,8 +121,8 @@ function [best_val best_pos] = swarm_run(fn, dim_range, agent_count, std_thresho
         if mean(curr_std) < std_threshold
             % msg = 'done'
             break;
-        end 
-        
+        end
+
         [next_pos next_v best_pos best_val] = swarm(pos, v, v_max);
         pos = next_pos;
         v   = next_v;
@@ -155,48 +155,48 @@ function [best_val best_pos] = swarm_run(fn, dim_range, agent_count, std_thresho
                         new_agent_count = new_agent_count - 1;
                         break;
                     end
-                end 
+                end
                 % if pos(1, i) - x_pos_mean > x_std_range || pos(2, i) - y_pos_mean > y_std_range
                 %     delete_mask(i) = 0;
                 %     new_agent_count = new_agent_count - 1;
-                % end 
+                % end
             end
             pos = pos(:, logical(delete_mask));
             v   = v(:, logical(delete_mask));
             agent_count = new_agent_count;
             agents_update(delete_mask);
-        end 
-        
-        new_v_max = norm(arrayfun(@(d) v_max_fn(std(pos(d, :))), (1:dim)));        
+        end
+
+        new_v_max = norm(arrayfun(@(d) v_max_fn(std(pos(d, :))), (1:dim)));
         % new_v_max = norm(arrayfun(@(d) (std(pos(d, :))/27)^(1/3), (1:dim)));
         if new_v_max < v_max
             v_max = new_v_max;
         end
-        
+
 
         % if sum(switch_box) > 0
-        %     new_v_max = norm(arrayfun(@(d) log(std(pos(d, :)) + 1), (1:dim)));        
+        %     new_v_max = norm(arrayfun(@(d) log(std(pos(d, :)) + 1), (1:dim)));
         %     if new_v_max < v_max
         %         v_max = new_v_max;
         %     end
         %     switch_box = zeros(1, dim);
-        % end 
+        % end
 
-        % if sum(switch_box) == dim 
+        % if sum(switch_box) == dim
         %     v_max = norm(arrayfun(@(d) log(std(pos(d, :)) + 1), (1:dim)));
         %     % v_max = v_max./10
         %     switch_box = zeros(1, dim);
-        % end 
+        % end
 
-        
+
         % x_pos_std
         % y_pos_std
 
-        % if x_pos_std(end) > 3 && y_pos_std(end) > 3 
+        % if x_pos_std(end) > 3 && y_pos_std(end) > 3
         %     if run_lvl == 0
         %         old_best_val = best_val;
         %         old_best_pos = best_pos;
-        %     end 
+        %     end
         %     run_lvl = run_lvl + 1;
         %     % accuracy_lvl = accuracy_lvl - 1;
         %     if run_lvl >= accuracy_lvl
@@ -223,10 +223,10 @@ function [best_val best_pos] = swarm_run(fn, dim_range, agent_count, std_thresho
         %         x_pos_std = [];
         %         y_pos_std = [];
         %         % no_of_bins = ceil(no_of_bins/2)
-        %     end 
-        % end 
+        %     end
+        % end
     end
-    % States: 
+    % States:
     % iterations = i
     % best_pos
     % best_val
@@ -236,7 +236,7 @@ function [best_val best_pos] = swarm_run(fn, dim_range, agent_count, std_thresho
     % agent_count
     % mean_curr_std = mean(curr_std)
 
-    
-    % ackley_fn(best_pos')    
+
+    % ackley_fn(best_pos')
     % figure, plot((1:length(best_val_hist)), best_val_hist);
 end
