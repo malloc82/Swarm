@@ -35,7 +35,7 @@ function test_result = pso_test(func_name, agents_count, dimensions, accuracy, m
     format_str = strcat(format_str, '   ],');
 
     for i = 1:test_runs
-        fprintf('%3.d ... ', i);
+        fprintf('%5.d ... ', i);
 
         t = cputime;
         [v, p] = pso_search(fn, parameters, 0);
