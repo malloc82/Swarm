@@ -12,13 +12,13 @@ function pso_status = pso_iteration(fn, parameters, pso_status)
         end
     end
 
-    pso_status.sd_pos = arrayfun(@(d) std(pso_status.pos(d, :)), (1:pso_status.dim));
-    pso_status.v_max  = new_v_max(pso_status.pos, pso_status.dim, pso_status.v_max);
+    % pso_status.sd_pos = arrayfun(@(d) std(pso_status.pos(d, :)), (1:pso_status.dim));
+    % pso_status.v_max  = new_v_max(pso_status.sd_pos, pso_status.v_max);
 
     update = 0;
     for i=1:parameters.agents_count
         val = fn(pso_status.pos(:, i)');
-        if val < pso_status.best_val(i)
+        if val <= pso_status.best_val(i)
             update = update + 1;
             pso_status.best_val(i) = val;
             pso_status.best_pos(:, i) = pso_status.pos(:, i);
