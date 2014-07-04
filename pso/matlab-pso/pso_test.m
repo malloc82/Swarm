@@ -1,4 +1,5 @@
-function test_result = pso_test(func_name, agents_count, dimensions, accuracy, max_runs, test_runs)
+function test_result = pso_test(func_name, agents_count, dimensions, accuracy, max_runs, test_runs, verbose)
+    % addpath('functions');
     fn_db = struct('rastrigin',   {@rastrigin, [-5, 5], 0}, ...
                    'ackley',      {mk_ackley(20, 0.2, 2*pi), [-32, 32], 0}, ...
                    'michalewicz', {mk_michalewicz(10), [0, pi], -1.801});
@@ -27,15 +28,29 @@ function test_result = pso_test(func_name, agents_count, dimensions, accuracy, m
 
     % test runs
 
-    % string format
-    format_str = '%1.6f : [';
-    for i=1:dimensions
-        format_str = strcat(format_str, '%11.6f');
+    if nargin == 7 && verbose == 1
+        % string formatn
+        format_str = '%1.6f : [';
+        for i=1:dimensions
+            format_str = strcat(format_str, '%11.6f');
+        end
+        format_str = strcat(format_str, '   ],');
+    else
+        verbose = 0;
     end
-    format_str = strcat(format_str, '   ],');
+
+
 
     for i = 1:test_runs
-        fprintf('%5.d ... ', i);
+        if verbose == 1
+            fprintf('%5.d ... ', i);
+        else
+            if i == 1
+                h = waitbar(0, 'Test progress');
+            else
+                waitbar(i/test_runs, h);
+            end
+        end
 
         t = cputime;
         [v, p] = pso_search(fn, parameters, 0);
@@ -43,14 +58,19 @@ function test_result = pso_test(func_name, agents_count, dimensions, accuracy, m
         test_result.elapsed_time = [test_result.elapsed_time; cputime - t];
         test_result.best_vals    = [test_result.best_vals;    v];
         test_result.best_pos     = [test_result.best_pos;     p'];
-
-        fprintf(format_str, v, p);
         if v > expected_val + 0.5 || v < expected_val - 0.5
             test_result.error_count = test_result.error_count + 1;
         end
-        fprintf('  error count = %3.d,  elapsed time = %.2fs\n', ...
-                test_result.error_count, ...
-                test_result.elapsed_time(i));
+
+        if verbose == 1
+            fprintf(format_str, v, p);
+            fprintf('  error count = %3.d,  elapsed time = %.2fs\n', ...
+                    test_result.error_count, ...
+                    test_result.elapsed_time(i));
+        end
+    end
+    if verbose == 0
+        close(h);
     end
     test_result.success_rate = 1 - test_result.error_count / test_result.total_runs;
 end
