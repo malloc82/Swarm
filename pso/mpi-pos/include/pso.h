@@ -10,65 +10,69 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include "test_fns.h"
 
 #define PI 3.14159265359
 #define E  2.7182818284
 
-extern double ackley_a;
-extern double ackley_b;
-extern double ackley_c;
-
-/* Test functions */
-double ackley      (const double *, const int);
-double michalewicz (const double *, const int);
-double rastrigin   (const double *, const int);
-
-/* Inner product of two vectors */
-double inner(const double *, const double *, const int);
-
-/* Generate a random double between two numbers */
-double randrange(const double, const double);
-
-/* Generate a random vector (double) of given size based on given range for each dimension */
-double * rand_array_varying_range(const double *, const double *, const size_t);
-double * rand_array_fixed_range(const double, const double, const size_t);
-
 /* PSO types */
-typedef struct {
-    unsigned int dimension;
-    unsigned int agents_count;
-    double       precision;
-} PSO_parameters;
-
 typedef struct {
     double lo;
     double hi;
 } PSO_range;
 
 typedef struct {
-    size_t   dim;
-    double * lo;
-    double * hi;
-} PSO_dim_range;
+    size_t      dimension;
+    PSO_range * ranges;
+    size_t      agents_count;
+    double      precision;
+    size_t      max_runs;
+    double      w;
+    double      a1;
+    double      a2;
+} PSO_parameters;
 
 typedef struct {
     double * pos;
-    double   val;
-} PSO_state; /* Try to use heap for this one */
+    double * v;
+    double * pos_best;
+    double   val_best;
+} PSO_state;
 
-/* Search functions */
-PSO_state * pso_search(double (*)(const double *, const int),
-                       const PSO_range *,
-                       const PSO_parameters *);
+typedef struct {
+    size_t      dimension;
+    PSO_state * agents_states;
+    double    * sd_pos;
+    double      v_max;
+    size_t      index_best;
+    double    * pos_best;
+    double      val_best;
+} PSO_status;
 
-/* PSO utility functions */
-double ** new_agents_pos(const size_t, const size_t);
-double ** release_agents_pos(double **, const size_t);
-PSO_state * new_agents_states(const size_t,
-                              const size_t,
-                              const PSO_range *,
-                              double (*)(const double *, const int));
-PSO_state * reset_state(PSO_state *);
-PSO_state * release_agents_states(PSO_state *, const size_t);
+/* search */
+PSO_status pso_init(func_type, const PSO_parameters *);
+
+void update_status(const PSO_parameters *, PSO_status *);
+
+void pso_iteration(func_type, const PSO_parameters *, PSO_status *);
+
+PSO_status pso_search(func_type, const PSO_parameters *);
+
+/* agents */
+double v_max_dim(const double);
+
+double new_v_max(const double *, const size_t, const double);
+
+double sd_dim(const PSO_state *, const size_t, const size_t);
+
+void update_sd_pos(double *, const PSO_state *, const size_t, const size_t);
+
+PSO_state * init_agents(func_type, const PSO_parameters *);
+
+PSO_state * free_agents(PSO_state * agents, const PSO_parameters *);
+
+void clear_status(PSO_status *, const PSO_parameters *);
+
+void clear_parameters(PSO_parameters *);
 
 #endif // PSO

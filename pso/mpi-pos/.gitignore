@@ -1,7 +1,5 @@
 # executables
-pso_seq
-ackley
-utils-test
+bin/*
 
 # object directory
 obj/*

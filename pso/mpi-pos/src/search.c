@@ -1,52 +1,89 @@
 #include "pso.h"
+#include "utils.h"
 
-int pso_update_state(const PSO_state *      agents_states, 
-                     PSO_state *            global, 
-                     const PSO_parameters * parameters)
+PSO_status pso_init(func_type fn, const PSO_parameters * parameters)
+/* Initialization, return a brand new PSO_status */
 {
-    int i, best_index = -1;
-    size_t data_size = parameters->dimension * sizeof(double);
-    for (i = 0; i < parameters->agents_count; ++i) {
-        if (agents_states[i].val < global->val) {
-            best_index = i;
+    size_t buffer_size = sizeof(double) * parameters->dimension;
+
+    PSO_status swarm_status;
+    swarm_status.dimension     = parameters->dimension;
+    swarm_status.agents_states = init_agents(fn, parameters);
+    swarm_status.sd_pos        = malloc(buffer_size);
+    swarm_status.index_best    = 0;
+    swarm_status.v_max         = -1;
+
+    update_status(parameters, &swarm_status);
+
+    return swarm_status;
+}
+
+void update_status(const PSO_parameters * parameters, PSO_status * swarm_status)
+/* update standard deviation, v_max, global_best */
+{
+    size_t index_best = swarm_status->index_best;
+    size_t i;
+    for (i = 1; i < parameters->agents_count; ++i) {
+        if (swarm_status->agents_states[i].val_best <= swarm_status->agents_states[index_best].val_best) {
+            index_best = i;
         }
     }
-    if (best_index >= 0) {
-        global->val = agents_states[best_index].val;
-        memcpy(agents_states[best_index].pos, global->pos, data_size);
+    swarm_status->index_best = index_best;
+    swarm_status->pos_best   = swarm_status->agents_states[index_best].pos_best; /* shadow copy */
+    swarm_status->val_best   = swarm_status->agents_states[index_best].val_best;
+
+    update_sd_pos(swarm_status->sd_pos,  swarm_status->agents_states,
+                  parameters->dimension, parameters->agents_count);
+    swarm_status->v_max = new_v_max(swarm_status->sd_pos, swarm_status->dimension, swarm_status->v_max);
+}
+
+void pso_iteration(func_type fn, const PSO_parameters * parameters, PSO_status * swarm_status)
+{
+    const size_t   dim         = parameters->dimension;
+    const size_t   count       = parameters->agents_count;
+    const double   w           = parameters->w;
+    const double   a1          = parameters->a1;
+    const double   a2          = parameters->a2;
+    const double   v_max       = swarm_status->v_max;
+    PSO_state const * agents_states = swarm_status->agents_states;
+
+    const size_t   buffer_size = sizeof(double) * dim;
+    double * a1_rand = rand_array_fixed_range(0, 1, count);
+    double * a2_rand = rand_array_fixed_range(0, 1, count);
+    double * new_v   = alloca(buffer_size);
+    size_t         n,i;
+
+    for (n = 0; n < count; ++n) {
+        for (i = 0; i < dim; ++i) {
+            /* update v */
+            new_v[i] =
+                agents_states[n].v[i]* w +
+                a1 * a1_rand[n] * (agents_states[n].pos_best[i] - agents_states[n].pos[i]) +
+                a2 * a2_rand[n] * (swarm_status->pos_best[i]    - agents_states[n].pos[i]);
+            /* update pos */
+            agents_states[n].pos[i] = agents_states[n].pos[i] + agents_states[n].v[i];
+        }
+        const double ratio = v_max/norm2(new_v, dim);
+        if (ratio < 1) {
+            for (i = 0; i < dim; ++i) {
+                agents_states[n].v[i] = new_v[i]*ratio;
+            }
+        } else {
+            memcpy(agents_states[n].v, new_v, buffer_size);
+        }
     }
-    return 0;
+    free(a1_rand);
+    free(a2_rand);
+    return;
 }
 
-int pso_walk(double **              agents_pos, 
-             PSO_state *            agents_states, 
-             const PSO_parameters * parameters,
-             double (*fn)(const double *, const int))
+PSO_status pso_search(func_type fn, const PSO_parameters * parameters)
 {
-    
-}
-
-PSO_state * pso_search(double (*fn)(const double *, const int), 
-                       const PSO_range * range, 
-                       const PSO_parameters * parameters)
-{
-    int n, d;
-    double **   agents_pos    = new_agents_pos   (parameters->agents_count, parameters->dimension);
-    PSO_state * agents_states = new_agents_states(parameters->agents_count, 
-                                                  parameters->dimension, 
-                                                  range, 
-                                                  fn);
-    PSO_state * optm_state = malloc(sizeof(PSO_state));
-    optm_state->pos = rand_array_fixed_range(range->lo, range->hi, parameters->dimension);
-    optm_state->val = fn(optm_state->pos, parameters->dimension);
-    
-    /* while (1) { */
-    /*     pso_update_state(agents_states, &best, parameters); */
-    /*     /\* pso_move(agents_pos, agents_state,  *\/ */
-        
-    /* } */
-    
-    agents_pos    = release_agents_pos(agents_pos, parameters->agents_count);
-    agents_states = release_agents_states(agents_states, parameters->agents_count);
-    return optm_state;
+    PSO_status swarm_status = pso_init(fn, parameters);
+    size_t i;
+    for (i = 0; i < parameters->max_runs; ++i) {
+        pso_iteration(fn, parameters, &swarm_status);
+        update_status(parameters, &swarm_status);
+    }
+    return swarm_status;
 }

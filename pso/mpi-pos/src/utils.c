@@ -1,14 +1,63 @@
 #include "pso.h"
 
-double inner(const double * x, const double * y, const int n)
+double inner(const double * x, const double * y, const size_t n)
 {
     double sum = 0;
-    int i;
+    size_t i;
     for (i = 0; i < n; ++i) {
         sum += (x[i]*y[i]);
     }
     return sum;
 }
+
+double norm1(const double * v, const size_t n)
+{
+    int i;
+    double sum = 0;
+    for (i = 0; i < n; ++i) {
+        const double x = v[i];
+        sum += (x >= 0) ? x : -x;
+    }
+    return sum;
+}
+
+double norm2(const double * v, const size_t n)
+{
+    int i;
+    double sum = 0;
+    for (i = 0; i < n; ++i) {
+        const double x = v[i];
+        sum += x*x;
+    }
+    return sqrt(sum);
+}
+
+void normalize(double * v, const size_t n)
+{
+    if (!v && !n) return;
+    double mag = norm2(v, n);
+    size_t i;
+    for (i = 0; i < n; ++i) {
+        v[i] = v[i] / mag;
+    }
+    return;
+}
+
+double sd(const double * x, const size_t len)
+{
+    double sum = 0, avg = 0;
+    size_t i;
+    for (i = 0; i < len; ++i) {
+        sum += x[i];
+    }
+    avg = sum / len;
+    for (i = 0, sum = 0; i < len; ++i) {
+        double Xi = (x[i] - avg);
+        sum += Xi*Xi;
+    }
+    return sqrt(sum / len);
+}
+
 
 double randrange(const double lo, const double hi) {
     unsigned int rand_val;
@@ -29,7 +78,7 @@ double randrange(const double lo, const double hi) {
     return lo + (hi - lo)*((double)rand_val/UINT_MAX);
 }
 
-double * rand_array_varying_range(const double * lo, const double * hi, const size_t len)
+double * rand_array_varying_range(const PSO_range * ranges, const size_t len)
 {
     size_t         data_size   = len*sizeof(unsigned int);
     size_t         len_written = 0;
@@ -49,7 +98,9 @@ double * rand_array_varying_range(const double * lo, const double * hi, const si
     close(rdev);
     array = malloc(sizeof(double) * len);
     for (i = 0; i < len; ++i) {
-        array[i] = lo[i] + (hi[i] - lo[i])*((double)rand_vals[i]/UINT_MAX);
+        const double lo = ranges[i].lo;
+        const double hi = ranges[i].hi;
+        array[i] = lo + (hi - lo)*((double)rand_vals[i]/UINT_MAX);
     }
     free(rand_vals);
     return array;
@@ -81,58 +132,3 @@ double * rand_array_fixed_range(const double lo, const double hi, const size_t l
     return array;
 }
 
-double ** new_agents_pos(const size_t agents_count, const size_t dimension)
-{
-    int n;
-    double ** agents_pos = malloc(agents_count*sizeof(double *));
-    for (n = 0; n < agents_count; ++n) {
-        agents_pos[n] = malloc(dimension*sizeof(double));
-    }
-    return agents_pos;
-}
-
-double ** release_agents_pos(double ** agents_pos, const size_t agents_count)
-{
-    int n;
-    for (n = 0; n < agents_count; ++n) {
-        free(agents_pos[n]);
-    }
-    free(agents_pos);
-    return NULL;
-}
-
-PSO_state * new_agents_states(const size_t      agents_count,
-                              const size_t      dimension,
-                              const PSO_range * range,
-                              double (*fn)(const double *, const int))
-
-{
-    int n;
-    PSO_state * agents_states = malloc(sizeof(PSO_state) * agents_count);
-    for (n = 0; n < agents_count; ++n) {
-        agents_states[n].pos = rand_array_fixed_range(range->lo, range->hi, dimension);
-        agents_states[n].val = fn(agents_states[n].pos, dimension);
-    }
-    return agents_states;
-}
-
-PSO_state * reset_state(PSO_state * agent_state)
-{
-    if (agent_state != NULL && agent_state->pos != NULL) {
-        free(agent_state->pos);
-        agent_state->pos = NULL;
-    }
-    free(agent_state);
-    return NULL;
-}
-
-PSO_state * release_agents_states(PSO_state * agents_states, const size_t n)
-{
-    int i;
-    for (i = 0; i < n; ++i) {
-        free(agents_states[i].pos);
-        agents_states[i].pos = NULL;
-    }
-    free(agents_states);
-    return NULL;
-}

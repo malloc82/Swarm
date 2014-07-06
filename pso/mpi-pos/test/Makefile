@@ -2,19 +2,19 @@
 SHELL   := /bin/bash
 CURDIR  := $(shell pwd)
 
-SRCDIR  := $(CURDIR)/src
-TESTDIR := $(CURDIR)/test
-INCLUDE := -I $(CURDIR)/include
+SRCDIR  := $(CURDIR)/../src
+TESTDIR := $(CURDIR)
+INCLUDE := -I $(CURDIR)/../include
 OBJDIR  := $(CURDIR)/obj
 
 SRC     := $(SRCDIR)/functions.c $(SRCDIR)/utils.c
-TESTSRC := $(TESTDIR)/ackley_test.c
+TESTSRC := $(TESTDIR)/fn_tests.c
 OBJ     := $(patsubst %.c,$(OBJDIR)/%.c.o,$(notdir $(SRC)))
 OBJ     += $(patsubst %.c,$(OBJDIR)/%.c.o,$(notdir $(TESTSRC)))
 LIB     := -lm
 DEBUG   := 
 
-EXEC    := $(CURDIR)/ackley 
+EXEC    := $(CURDIR)/fn_tests
 
 MPICC   := $(shell which mpicc) # /opt/local/bin/mpicc-openmpi-mp
 MPIRUN  := $(shell which mpirun)
