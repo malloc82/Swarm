@@ -28,6 +28,7 @@ SEQ_EXEC := $(BINDIR)/pso_seq
 
 # variables for compiling mpi code
 MPI_SRC := $(SRCDIR)/pso_mpi_main.c \
+		   $(SRCDIR)/search.c \
 		   $(SRCDIR)/agents.c \
 		   $(SRCDIR)/functions.c \
 		   $(SRCDIR)/utils.c \

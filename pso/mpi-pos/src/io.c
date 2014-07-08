@@ -9,6 +9,9 @@ void read_parameter_size_t(char       * input,
     errno = 0;
     if (!input) {
         fprintf(stderr, "Error: input is NULL while reading %s. quit.", name);
+#ifdef PSO_MPI
+        MPI_Finalize();
+#endif
         exit(EXIT_FAILURE);
     }
     val = strtol(input, &endptr, 10);
@@ -16,10 +19,16 @@ void read_parameter_size_t(char       * input,
         (errno != 0 && val == 0))
     {
         fprintf(stderr, "strtol error while reading %s. quit.\n", name);
+#ifdef PSO_MPI
+        MPI_Finalize();
+#endif
         exit(EXIT_FAILURE);
     }
     if (endptr == input) {
         fprintf(stderr, "No digits were found while reading %s. quite\n", name);
+#ifdef PSO_MPI
+        MPI_Finalize();
+#endif
         exit(EXIT_FAILURE);
     }
     *var = val;
@@ -32,11 +41,17 @@ void read_parameter_double(char       * input,
     int items_read = 0;
     if (!input) {
         fprintf(stderr, "Expecting argument for %s, not found. quit.\n", name);
+#ifdef PSO_MPI
+        MPI_Finalize();
+#endif
         exit(EXIT_FAILURE);
     }
     items_read = sscanf(input, "%lf", var);
     if (items_read == 0) {
         fprintf(stderr, "Couldn't read input for %s... quit.\n", name);
+#ifdef PSO_MPI
+        MPI_Finalize();
+#endif
         exit(EXIT_FAILURE);
     }
     return;
@@ -48,6 +63,9 @@ void read_parameter_range(char * input, PSO_parameters * parameters)
     char * token = NULL;
     if (!input) {
         fprintf(stderr, "Expecting argument for ranges, not found. quit.\n");
+#ifdef PSO_MPI
+        MPI_Finalize();
+#endif
         exit(EXIT_FAILURE);
     }
     parameters->ranges = malloc(sizeof(PSO_range)*parameters->dimension);
@@ -57,6 +75,9 @@ void read_parameter_range(char * input, PSO_parameters * parameters)
         items_read = sscanf(token, "%lf,%lf", &parameters->ranges[i].lo, &parameters->ranges[i].hi);
         if (items_read != 2) {
             fprintf(stderr, "Error reading range info, i = %d. abort.\n", i);
+#ifdef PSO_MPI
+            MPI_Finalize();
+#endif
             exit(EXIT_FAILURE);
         }
         if (parameters->ranges[i].lo > parameters->ranges[i].hi) {
@@ -81,6 +102,9 @@ func_type read_parameter_func_type(char * input, const char * name)
         return michalewicz;
     } else {
         fprintf(stderr, "function type is not found. quit");
+#ifdef PSO_MPI
+        MPI_Finalize();
+#endif
         exit(EXIT_FAILURE);
     }
     return NULL;
