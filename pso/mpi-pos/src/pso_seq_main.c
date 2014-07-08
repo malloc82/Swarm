@@ -92,14 +92,18 @@ int main(int argc, char *argv[])
 
     print_parameters(&parameters);
 
-    printf("**********************************\n");
+    printf("*********************************************************************\n");
     printf(" start search : \n\n");
-    PSO_status result = pso_search(fn, &parameters);
-    printf("   pso search result = %lf, ", result.val_best);
-    print_double_vec("  pso = ", result.pos_best, parameters.dimension, "\n");
-    printf("**********************************\n");
+    for (i = 0; i < test_runs; ++i) {
+        PSO_status result = pso_search(fn, &parameters);
+        /* printf("   pso search (%lu) result = %lf, ", i, result.val_best); */
+        /* print_double_vec("  pso = ", result.pos_best, parameters.dimension, "\n"); */
+        pso_print_result(i, result.pos_best, parameters.dimension, result.val_best);
+        clear_status(&result, &parameters);
+    }
 
-    clear_status(&result, &parameters);
+    printf("*********************************************************************\n");
+
     clear_parameters(&parameters);
 
     return 0;

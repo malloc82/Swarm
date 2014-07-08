@@ -15,4 +15,6 @@ void print_parameters(const PSO_parameters *);
 
 void print_double_vec(const char *, const double *, const size_t, const char *);
 
+void pso_print_result(const size_t, const double *, const size_t, const double);
+
 #endif /* IO_H */

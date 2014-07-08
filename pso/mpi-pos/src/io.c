@@ -131,3 +131,14 @@ void print_double_vec(const char * prefix, const double * vec, const size_t n, c
         printf("]");
     return;
 }
+
+void pso_print_result(const size_t iteration, const double * vec, const size_t n, const double val)
+{
+    size_t i;
+    printf("%4.lu : [%11.6lf", iteration, vec[0]);
+    for (i = 1; i < n; ++i) {
+        printf(",%11.6lf", vec[i]);
+    }
+    printf("  ] = %11.6lf\n", val);
+    return;
+}
