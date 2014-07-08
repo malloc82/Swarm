@@ -13,6 +13,6 @@ func_type read_parameter_func_type(char *, const char *);
 
 void print_parameters(const PSO_parameters *);
 
-void printf_double_vec(const char *, const double *, const size_t, const char *);
+void print_double_vec(const char *, const double *, const size_t, const char *);
 
 #endif /* IO_H */
