@@ -92,6 +92,36 @@ void read_parameter_range(char * input, PSO_parameters * parameters)
     return;
 }
 
+void read_parameter_data_double(char * input,  double ** data, const size_t n)
+{
+    int items_read = 0, i = 0;
+    char * token = NULL;
+    if (!input) {
+        fprintf(stderr, "Expecting argument for ranges, not found. quit.\n");
+#ifdef PSO_MPI
+        MPI_Finalize();
+#endif
+        exit(EXIT_FAILURE);
+    }
+    *data = malloc(sizeof(double)*n);
+    for (i = 0, token = strtok(input, ", ");
+         token != NULL && i < n;
+         ++i, token = strtok(NULL, ", ")) {
+        items_read = sscanf(token, "%lf", (*data)+i);
+        if (items_read != 1) {
+            fprintf(stderr, "Error reading range info, i = %d. abort.\n", i);
+#ifdef PSO_MPI
+            MPI_Finalize();
+#endif
+            exit(EXIT_FAILURE);
+        }
+    }
+    if (i != n) {
+        fprintf(stderr, "Reading ranges: only %d elements are read, incomplete data.\n", i);
+    }
+    return;
+}
+
 func_type read_parameter_func_type(char * input, const char * name)
 {
     if (strcmp(input, "rastrigin") == 0) {

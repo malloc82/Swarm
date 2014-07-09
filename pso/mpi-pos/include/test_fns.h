@@ -1,6 +1,7 @@
 #ifndef _TEST_FNS_H_
 #define _TEST_FNS_H_
 
+#include <stdlib.h>
 #include <math.h>
 
 typedef double (*func_type)(const double *, const size_t);

@@ -34,7 +34,7 @@ MPI_SRC := $(SRCDIR)/pso_mpi_main.c \
 		   $(SRCDIR)/utils.c \
 		   $(SRCDIR)/io.c
 
-MPI_OBJDIR  := $(CURDIR)/obj_seq
+MPI_OBJDIR  := $(CURDIR)/obj_mpi
 MPI_OBJ     := $(patsubst %.c,$(MPI_OBJDIR)/%.c.o,$(notdir $(MPI_SRC)))
 MPI_LIB     := 
 MPI_CFLAGS  := $(shell $(MPICC) --showme:compile)
@@ -67,7 +67,7 @@ $(SEQ_OBJDIR)/%.c.o: $(TESTDIR)/%.c
 # Rules for compiling mpi code
 
 $(MPI_EXEC): $(MPI_SRC) $(MPI_OBJ)
-	$(VERBOSE) $(CC) $(LIB) $(MPI_LDFLAGS) $(OBJ) -o $@
+	$(VERBOSE) $(CC) $(LIB) $(MPI_LDFLAGS) $(MPI_OBJ) -o $@
 
 $(MPI_OBJDIR)/%.c.o: $(SRCDIR)/%.c
 	$(VERBOSE) $(CC) $(DEBUG) $(MPI_CFLAGS) $(INCLUDE) -c $< -o $@
@@ -80,5 +80,9 @@ makedirectories:
 	$(VERBOSE) mkdir -p $(SEQ_OBJDIR)
 	$(VERBOSE) mkdir -p $(MPI_OBJDIR)
 
-clean:
-	$(VERBOSE) rm -rf $(SEQ_OBJDIR) $(MPI_OBJDIR) $(EXEC)
+clean_all:
+	$(VERBOSE) rm -rf $(SEQ_OBJDIR) $(MPI_OBJDIR) $(SEQ_EXEC) $(MPI_EXEC)
+clean_mpi: 
+	$(VERBOSE) rm -rf $(MPI_OBJDIR) $(MPI_EXEC)
+clean_seq:
+	$(VERBOSE) rm -rf $(SEQ_OBJDIR)  $(SEQ_EXEC)
