@@ -168,21 +168,17 @@ void print_parameters(const PSO_parameters * parameters)
     return;
 }
 
-void print_double_vec(const char * prefix, const double * vec, const size_t n, const char * postfix)
+void print_double_vec(const char * name, const double * vec, const size_t n)
 {
     size_t i;
-    if (prefix)
-        printf("%s[%lf", prefix, vec[0]);
+    if (name)
+        printf("%s : [%lf", name, vec[0]);
     else
         printf("[%lf", vec[0]);
 
     for (i = 1; i < n; ++i)
         printf(", %lf", vec[i]);
-
-    if (postfix)
-        printf("]%s", postfix);
-    else
-        printf("]");
+    puts("]");
     return;
 }
 

@@ -12,10 +12,10 @@ double new_v_max(const double * sd_pos, const size_t dim, const double curr_v_ma
     size_t i;
     for (i = 0; i < dim; ++i) {
         const double s = sd_pos[i];
-        v[i] = (s > 1) ? exp(s + 1) : exp(s*s + 1);
+        v[i] = (s > 1) ? log(s + 1) : log(s*s + 1);
     }
     const double v_max = norm2(v, dim);
-    return (v_max >= curr_v_max) ? curr_v_max : v_max;
+    return (curr_v_max > 0 && v_max >= curr_v_max) ? curr_v_max : v_max;
 }
 
 double sd_dim(const PSO_state * states, const size_t d, const size_t N)

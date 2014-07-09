@@ -15,7 +15,7 @@ func_type read_parameter_func_type(char *, const char *);
 
 void print_parameters(const PSO_parameters *);
 
-void print_double_vec(const char *, const double *, const size_t, const char *);
+void print_double_vec(const char *, const double *, const size_t);
 
 void pso_print_result(const size_t, const double *, const size_t, const double);
 

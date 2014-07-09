@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     for (i = 0; i < test_runs; ++i) {
         PSO_status result = pso_search(fn, &parameters);
         /* printf("   pso search (%lu) result = %lf, ", i, result.val_best); */
-        /* print_double_vec("  pso = ", result.pos_best, parameters.dimension, "\n"); */
+        /* print_double_vec("pos", result.pos_best, parameters.dimension); */
         pso_print_result(i, result.pos_best, parameters.dimension, result.val_best);
         clear_status(&result, &parameters);
     }
