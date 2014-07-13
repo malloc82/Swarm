@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     int c, longindex;
     func_type fn = NULL;
     char * range_str = NULL;
-    size_t arglen = 0;
+    size_t range_str_len = 0;
     size_t i;
     size_t test_runs = 1;
     PSO_parameters parameters = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -43,19 +43,21 @@ int main(int argc, char *argv[])
                 fn = read_parameter_func_type(optarg, "function");
                 break;
             case 'd': /* dimension */
-                parameters.dimension = read_parameter_size_t(optarg, "dimension");
+                if (!parameters.ranges) {
+                    parameters.dimension = read_parameter_size_t(optarg, "dimension");
+                }
                 break;
             case 'r': /* ranges */
-                if (parameters.dimension > 0) {
-                    read_parameter_range(optarg, &parameters);
-                } else if (!optarg) {
+                if (!optarg) {
                     fprintf(stderr, "Expecting argument for ranges, not found. quit.\n");
                     MPI_Finalize();
                     exit(EXIT_FAILURE);
                 } else {
-                    arglen = strlen(optarg) + 1;
-                    range_str = alloca(sizeof(char) * arglen);
-                    strncpy(range_str, optarg, arglen);
+                    range_str_len = strlen(optarg) + 1;
+                    range_str = malloc(sizeof(char) * range_str_len);
+                    strncpy(range_str, optarg, range_str_len);
+                    read_parameter_range(range_str, &parameters);
+                    free(range_str);
                 }
                 break;
             case 'n': /* agents count */
@@ -83,15 +85,6 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "Unrecognized flag %c ... abort\n", c);
                 MPI_Finalize();
                 exit(EXIT_FAILURE);
-        }
-    }
-    if (!parameters.ranges) {
-        if (range_str && parameters.dimension > 0) {
-            read_parameter_range(optarg, &parameters);
-        } else {
-            fprintf(stderr, "Error: no range specified. abort");
-            MPI_Finalize();
-            exit(EXIT_FAILURE);
         }
     }
 

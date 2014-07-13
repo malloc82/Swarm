@@ -1,10 +1,7 @@
 #include "io.h"
 #include <errno.h>
 
-size_t read_parameter_size_t(char * input, const char * name) {
-    char * endptr;
-    size_t val;
-    errno = 0;
+size_t read_parameter_size_t(const char * input, const char * name) {
     if (!input) {
         fprintf(stderr, "Error: input is NULL while reading %s. quit.", name);
 #ifdef PSO_MPI
@@ -12,6 +9,10 @@ size_t read_parameter_size_t(char * input, const char * name) {
 #endif
         exit(EXIT_FAILURE);
     }
+
+    char * endptr;
+    size_t val;
+    errno = 0;
     val = strtol(input, &endptr, 10);
     if ((errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)) ||
         (errno != 0 && val == 0))
@@ -32,9 +33,7 @@ size_t read_parameter_size_t(char * input, const char * name) {
     return val;
 }
 
-double read_parameter_double(char * input, const char * name) {
-    int items_read = 0;
-    double val;
+double read_parameter_double(const char * input, const char * name) {
     if (!input) {
         fprintf(stderr, "Expecting argument for %s, not found. quit.\n", name);
 #ifdef PSO_MPI
@@ -42,6 +41,9 @@ double read_parameter_double(char * input, const char * name) {
 #endif
         exit(EXIT_FAILURE);
     }
+
+    int items_read = 0;
+    double val;
     items_read = sscanf(input, "%lf", &val);
     if (items_read == 0) {
         fprintf(stderr, "Couldn't read input for %s... quit.\n", name);
@@ -53,10 +55,8 @@ double read_parameter_double(char * input, const char * name) {
     return val;
 }
 
-void read_parameter_range(char * input, PSO_parameters * parameters)
+void read_parameter_range(const char * input, PSO_parameters * parameters)
 {
-    int items_read = 0, i = 0;
-    char * token = NULL;
     if (!input) {
         fprintf(stderr, "Expecting argument for ranges, not found. quit.\n");
 #ifdef PSO_MPI
@@ -64,13 +64,23 @@ void read_parameter_range(char * input, PSO_parameters * parameters)
 #endif
         exit(EXIT_FAILURE);
     }
-    parameters->ranges = malloc(sizeof(PSO_range)*parameters->dimension);
-    for (i = 0, token = strtok(input, ";");
-         token != NULL && i < parameters->dimension;
-         ++i, token = strtok(NULL, ";")) {
+
+    size_t items_read = 0, i = 0, input_len = strlen(input) + 1;
+    char * token = NULL;
+    char * input_str = malloc(sizeof(char) * input_len);
+    strncpy(input_str, input, input_len);
+    /* Finding out dimensions */
+    for (i = 0, token = strtok(input_str, "; "); token != NULL; ++i, token = strtok(NULL, "; "));
+    strncpy(input_str, input, input_len); /* reset */
+
+    parameters->dimension = i;
+    parameters->ranges = malloc(sizeof(PSO_range)*i);
+
+    for (i = 0, token = strtok(input_str, ";"); token != NULL; ++i, token = strtok(NULL, ";")) {
         items_read = sscanf(token, "%lf,%lf", &parameters->ranges[i].lo, &parameters->ranges[i].hi);
         if (items_read != 2) {
             fprintf(stderr, "Error reading range info, i = %d. abort.\n", i);
+            free(input_str);
 #ifdef PSO_MPI
             MPI_Finalize();
 #endif
@@ -82,16 +92,12 @@ void read_parameter_range(char * input, PSO_parameters * parameters)
             parameters->ranges[i].hi = temp;
         }
     }
-    if (i != parameters->dimension) {
-        fprintf(stderr, "Reading ranges: only %d dimensions are read, incomplete data.\n", i);
-    }
+    free(input_str);
     return;
 }
 
-void read_parameter_data_double(char * input,  double ** data, const size_t n)
+void read_parameter_data_double(const char * input,  double ** data, const size_t n)
 {
-    int items_read = 0, i = 0;
-    char * token = NULL;
     if (!input) {
         fprintf(stderr, "Expecting argument for ranges, not found. quit.\n");
 #ifdef PSO_MPI
@@ -99,26 +105,33 @@ void read_parameter_data_double(char * input,  double ** data, const size_t n)
 #endif
         exit(EXIT_FAILURE);
     }
+
+    size_t items_read = 0, i = 0, input_len = strlen(input) + 1;
+    char * token     = NULL;
+    char * input_str = malloc(sizeof(char) * input_len);
+    strncpy(input_str, input, input_len);
     *data = malloc(sizeof(double)*n);
-    for (i = 0, token = strtok(input, ", ");
+    for (i = 0, token = strtok(input_str, ", ");
          token != NULL && i < n;
          ++i, token = strtok(NULL, ", ")) {
         items_read = sscanf(token, "%lf", (*data)+i);
         if (items_read != 1) {
             fprintf(stderr, "Error reading range info, i = %d. abort.\n", i);
+            free(input_str);
 #ifdef PSO_MPI
             MPI_Finalize();
 #endif
             exit(EXIT_FAILURE);
         }
     }
+    free(input_str);
     if (i != n) {
         fprintf(stderr, "Reading ranges: only %d elements are read, incomplete data.\n", i);
     }
     return;
 }
 
-func_type read_parameter_func_type(char * input, const char * name)
+func_type read_parameter_func_type(const char * input, const char * name)
 {
     if (strcmp(input, "rastrigin") == 0) {
         return rastrigin;

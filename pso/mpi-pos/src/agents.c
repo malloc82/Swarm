@@ -49,6 +49,7 @@ PSO_state * init_agents(func_type fn, const PSO_parameters * parameters)
     const size_t dim          = parameters->dimension;
     const size_t n            = parameters->agents_count;
     const size_t buffer_size  = sizeof(double) * dim;
+
     PSO_state * agents_states = malloc(sizeof(PSO_state) * n);
 
     for (i = 0; i < n; ++i) {
