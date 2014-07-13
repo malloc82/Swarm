@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
                 fn = read_parameter_func_type(optarg, "function");
                 break;
             case 'd': /* dimension */
-                read_parameter_size_t(optarg, &parameters.dimension, "dimension");
+                parameters.dimension = read_parameter_size_t(optarg, "dimension");
                 break;
             case 'r': /* ranges */
                 if (parameters.dimension > 0) {
@@ -59,25 +59,25 @@ int main(int argc, char *argv[])
                 }
                 break;
             case 'n': /* agents count */
-                read_parameter_size_t(optarg, &parameters.agents_count, "agents count");
+                parameters.agents_count = read_parameter_size_t(optarg, "agents count");
                 break;
             case 'p': /* precision */
-                read_parameter_double(optarg, &parameters.precision, "precision");
+                parameters.precision = read_parameter_double(optarg, "precision");
                 break;
             case 'i': /* max iterations */
-                read_parameter_size_t(optarg, &parameters.max_runs, "max runs");
+                parameters.max_runs = read_parameter_size_t(optarg, "max runs");
                 break;
             case 'w':
-                read_parameter_double(optarg, &parameters.w, "w");
+                parameters.w = read_parameter_double(optarg, "w");
                 break;
             case 'a': /* a1 */
-                read_parameter_double(optarg, &parameters.a1, "a1");
+                parameters.a1 = read_parameter_double(optarg, "a1");
                 break;
             case 'b': /* a2 */
-                read_parameter_double(optarg, &parameters.a2, "a2");
+                parameters.a2 = read_parameter_double(optarg, "a2");
                 break;
             case 't':
-                read_parameter_size_t(optarg, &test_runs, "test runs");
+                test_runs = read_parameter_size_t(optarg, "test runs");
                 break;
             default:
                 fprintf(stderr, "Unrecognized flag %c ... abort\n", c);

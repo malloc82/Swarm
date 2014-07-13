@@ -3,15 +3,15 @@
 
 #include "pso.h"
 
-void read_parameter_size_t(char * , size_t * , const char *);
+size_t read_parameter_size_t(char *, const char *);
 
-void read_parameter_double(char *, double *, const char *);
+double read_parameter_double(char *, const char *);
+
+func_type read_parameter_func_type(char *, const char *);
 
 void read_parameter_range(char *, PSO_parameters *);
 
 void read_parameter_data_double(char *,  double **, const size_t);
-
-func_type read_parameter_func_type(char *, const char *);
 
 void print_parameters(const PSO_parameters *);
 

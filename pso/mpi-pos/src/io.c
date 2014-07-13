@@ -1,9 +1,7 @@
 #include "io.h"
 #include <errno.h>
 
-void read_parameter_size_t(char       * input,
-                           size_t     * var,
-                           const char * name) {
+size_t read_parameter_size_t(char * input, const char * name) {
     char * endptr;
     size_t val;
     errno = 0;
@@ -31,14 +29,12 @@ void read_parameter_size_t(char       * input,
 #endif
         exit(EXIT_FAILURE);
     }
-    *var = val;
-    return;
+    return val;
 }
 
-void read_parameter_double(char       * input,
-                           double     * var,
-                           const char * name) {
+double read_parameter_double(char * input, const char * name) {
     int items_read = 0;
+    double val;
     if (!input) {
         fprintf(stderr, "Expecting argument for %s, not found. quit.\n", name);
 #ifdef PSO_MPI
@@ -46,7 +42,7 @@ void read_parameter_double(char       * input,
 #endif
         exit(EXIT_FAILURE);
     }
-    items_read = sscanf(input, "%lf", var);
+    items_read = sscanf(input, "%lf", &val);
     if (items_read == 0) {
         fprintf(stderr, "Couldn't read input for %s... quit.\n", name);
 #ifdef PSO_MPI
@@ -54,7 +50,7 @@ void read_parameter_double(char       * input,
 #endif
         exit(EXIT_FAILURE);
     }
-    return;
+    return val;
 }
 
 void read_parameter_range(char * input, PSO_parameters * parameters)
