@@ -67,7 +67,7 @@ void read_parameter_range(const char * input, PSO_parameters * parameters)
 
     size_t items_read = 0, i = 0, input_len = strlen(input) + 1;
     char * token = NULL;
-    char * input_str = malloc(sizeof(char) * input_len);
+    char * input_str = alloca(sizeof(char) * input_len);
     strncpy(input_str, input, input_len);
     /* Finding out dimensions */
     for (i = 0, token = strtok(input_str, "; "); token != NULL; ++i, token = strtok(NULL, "; "));
@@ -80,7 +80,6 @@ void read_parameter_range(const char * input, PSO_parameters * parameters)
         items_read = sscanf(token, "%lf,%lf", &parameters->ranges[i].lo, &parameters->ranges[i].hi);
         if (items_read != 2) {
             fprintf(stderr, "Error reading range info, i = %d. abort.\n", i);
-            free(input_str);
 #ifdef PSO_MPI
             MPI_Finalize();
 #endif
@@ -92,7 +91,6 @@ void read_parameter_range(const char * input, PSO_parameters * parameters)
             parameters->ranges[i].hi = temp;
         }
     }
-    free(input_str);
     return;
 }
 

@@ -41,16 +41,7 @@ int main(int argc, char *argv[])
                 }
                 break;
             case 'r': /* ranges */
-                if (!optarg) {
-                    fprintf(stderr, "Expecting argument for ranges, not found. quit.\n");
-                    exit(EXIT_FAILURE);
-                } else {
-                    range_str_len = strlen(optarg) + 1;
-                    range_str     = malloc(sizeof(char) * range_str_len);
-                    strncpy(range_str, optarg, range_str_len);
-                    read_parameter_range(range_str, &parameters);
-                    free(range_str);
-                }
+                read_parameter_range(optarg, &parameters);
                 break;
             case 'n': /* agents count */
                 parameters.agents_count = read_parameter_size_t(optarg, "agents count");
