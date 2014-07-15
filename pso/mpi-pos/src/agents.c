@@ -65,7 +65,6 @@ PSO_state * init_agents(func_type fn, const PSO_parameters * parameters)
 PSO_state * free_agents(PSO_state * agents, const PSO_parameters * parameters)
 {
     size_t i;
-    const size_t dim = parameters->dimension;
     const size_t n   = parameters->agents_count;
     for (i = 0; i < n; ++i) {
         free(agents[i].pos);

@@ -20,12 +20,8 @@ static struct option pso_options[] = {
 
 int main(int argc, char *argv[])
 {
-    int id = -1;
-    int p  = 0;
     int c, longindex;
     func_type fn = NULL;
-    char * range_str = NULL;
-    size_t range_str_len = 0;
     size_t i;
     size_t test_runs = 1;
     PSO_parameters parameters = {0, 0, 0, 0, 0, 0, 0, 0};

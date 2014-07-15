@@ -21,7 +21,7 @@ SEQ_SRC := $(SRCDIR)/pso_seq_main.c \
 SEQ_OBJDIR := $(CURDIR)/obj_seq
 SEQ_OBJ    := $(patsubst %.c,$(SEQ_OBJDIR)/%.c.o,$(notdir $(SEQ_SRC)))
 SEQ_LIB    := 
-CFLAGS     := 
+CFLAGS     := -Wall
 LDFLAGS    := -lm
 
 SEQ_EXEC := $(BINDIR)/pso_seq
@@ -37,7 +37,7 @@ MPI_SRC := $(SRCDIR)/pso_mpi_main.c \
 MPI_OBJDIR  := $(CURDIR)/obj_mpi
 MPI_OBJ     := $(patsubst %.c,$(MPI_OBJDIR)/%.c.o,$(notdir $(MPI_SRC)))
 MPI_LIB     := 
-MPI_CFLAGS  := $(shell $(MPICC) --showme:compile)
+MPI_CFLAGS  := $(shell $(MPICC) --showme:compile) -Wall
 MPI_LDFLAGS := $(shell $(MPICC) --showme:link)
 
 MPI_EXEC    := $(BINDIR)/pso_mpi

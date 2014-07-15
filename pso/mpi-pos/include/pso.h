@@ -22,6 +22,11 @@ typedef struct {
 } PSO_range;
 
 typedef struct {
+#ifdef PSO_MPI
+    int         id; /* Used for MPI */
+    int         p;
+    int       * neighbors;
+#endif
     size_t      dimension;
     PSO_range * ranges;
     size_t      agents_count;

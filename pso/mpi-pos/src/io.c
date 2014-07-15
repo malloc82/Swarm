@@ -79,7 +79,7 @@ void read_parameter_range(const char * input, PSO_parameters * parameters)
     for (i = 0, token = strtok(input_str, ";"); token != NULL; ++i, token = strtok(NULL, ";")) {
         items_read = sscanf(token, "%lf,%lf", &parameters->ranges[i].lo, &parameters->ranges[i].hi);
         if (items_read != 2) {
-            fprintf(stderr, "Error reading range info, i = %d. abort.\n", i);
+            fprintf(stderr, "Error reading range info, i = %lu. abort.\n", i);
 #ifdef PSO_MPI
             MPI_Finalize();
 #endif
@@ -114,7 +114,7 @@ void read_parameter_data_double(const char * input,  double ** data, const size_
          ++i, token = strtok(NULL, ", ")) {
         items_read = sscanf(token, "%lf", (*data)+i);
         if (items_read != 1) {
-            fprintf(stderr, "Error reading range info, i = %d. abort.\n", i);
+            fprintf(stderr, "Error reading range info, i = %lu. abort.\n", i);
             free(input_str);
 #ifdef PSO_MPI
             MPI_Finalize();
@@ -124,7 +124,7 @@ void read_parameter_data_double(const char * input,  double ** data, const size_
     }
     free(input_str);
     if (i != n) {
-        fprintf(stderr, "Reading ranges: only %d elements are read, incomplete data.\n", i);
+        fprintf(stderr, "Reading ranges: only %lu elements are read, incomplete data.\n", i);
     }
     return;
 }

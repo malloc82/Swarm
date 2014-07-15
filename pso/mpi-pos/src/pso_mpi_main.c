@@ -1,11 +1,11 @@
+#include "pso_mpi.h"
+
 #include "pso.h"
 #include "test_fns.h"
 #include "io.h"
 
 #include <getopt.h>
 #include <mpi.h>
-
-#define PSO_MPI 1
 
 static struct option pso_options[] = {
     {"fn",           required_argument, 0, 'f'},
@@ -27,15 +27,12 @@ int main(int argc, char *argv[])
     int p  = 0;
     int c, longindex;
     func_type fn = NULL;
-    char * range_str = NULL;
-    size_t range_str_len = 0;
-    size_t i;
     size_t test_runs = 1;
-    PSO_parameters parameters = {0, 0, 0, 0, 0, 0, 0, 0};
+    PSO_parameters parameters = {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     MPI_Init(&argc, &argv);
-    MPI_Comm_rank(MPI_COMM_WORLD, &id);
-    MPI_Comm_size(MPI_COMM_WORLD, &p);
+    MPI_Comm_rank(MPI_COMM_WORLD, &parameters.id);
+    MPI_Comm_size(MPI_COMM_WORLD, &parameters.p);
 
     while ((c = getopt_long(argc, argv, "w:a:b:", pso_options, &longindex)) != -1) {
         switch (c) {
@@ -48,13 +45,7 @@ int main(int argc, char *argv[])
                 }
                 break;
             case 'r': /* ranges */
-                if (!optarg) {
-                    fprintf(stderr, "Expecting argument for ranges, not found. quit.\n");
-                    MPI_Finalize();
-                    exit(EXIT_FAILURE);
-                } else {
-                    read_parameter_range(optarg, &parameters);
-                }
+                read_parameter_range(optarg, &parameters);
                 break;
             case 'n': /* agents count */
                 parameters.agents_count = read_parameter_size_t(optarg, "agents count");
@@ -91,16 +82,6 @@ int main(int argc, char *argv[])
     }
 
     print_parameters(&parameters);
-
-    /* printf("*********************************************************************\n"); */
-    /* printf(" start search : \n\n"); */
-    /* for (i = 0; i < test_runs; ++i) { */
-    /*     PSO_status result = pso_search(fn, &parameters); */
-    /*     /\* printf("   pso search (%lu) result = %lf, ", i, result.val_best); *\/ */
-    /*     /\* print_double_vec("  pso = ", result.pos_best, parameters.dimension, "\n"); *\/ */
-    /*     pso_print_result(i, result.pos_best, parameters.dimension, result.val_best); */
-    /*     clear_status(&result, &parameters); */
-    /* } */
 
     printf("*********************************************************************\n");
 
