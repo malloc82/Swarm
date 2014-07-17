@@ -23,60 +23,55 @@ int * setup_neighbors(const int id, const int p, size_t * count)
         const int col     = id % width;
         const int max_row = last_id / width;
         const int max_col = last_id % width;
+
         /* printf("\n width = %d", width); */
         /* printf("\n row = %d, col = %d", row, col); */
         /* printf("\n max_row = %d, max_col = %d", max_row, max_col); */
+
+        *count = 0;
         /* up */
-        neighbors[0] = (row - 1) * width + col;
         if (row == 0) {
             if (col <= max_col) {
-                neighbors[0] = max_row * width + col;
+                neighbors[*count] = max_row * width + col;
             } else {
-                neighbors[0] = (max_row - 1) * width + col;
+                neighbors[*count] = (max_row - 1) * width + col;
             }
+        } else {
+            neighbors[*count] = (row - 1) * width + col;
         }
+        (*count) += (neighbors[*count] == id) ? 0 : 1; /* update count */
+
         /* down */
-        neighbors[1] = (row + 1) * width + col;
-        if (neighbors[1] >= p) {
-            neighbors[1] = col;
+        if (row == max_row || col > max_col) {
+            neighbors[*count] = col;
+        } else {
+            neighbors[*count] = (row + 1) * width + col;
         }
-        *count = (neighbors[0] == neighbors[1]) ? 1 : 2;
+        (*count) += (neighbors[*count] == id ||
+                     (*count != 0 && neighbors[(*count)-1] == neighbors[*count])) ? 0 : 1;
 
-        if (*count == 1) {
-            neighbors[1] = -1;
-        }
         /* left */
-        neighbors[2] = row * width + (col - 1);
         if (col == 0) {
-            if (row < max_row) {
-                neighbors[2] = (row + 1) * width - 1;
-            } else {
-                neighbors[2] = last_id;
-            }
+            neighbors[*count] = (row < max_row) ? (row + 1) * width - 1 : last_id;
+        } else {
+            neighbors[*count] = row * width + (col - 1);
         }
-        /* right */
-        neighbors[3] = row * width + col + 1;
-        if (neighbors[3] > last_id && col != width - 1) {
-            neighbors[3] = last_id;
-        } else if (col == width - 1)  {
-            neighbors[3] = row * width;
-        }
-        *count += (neighbors[2] == neighbors[3]) ? 1 : 2;
-        switch(*count) {
-            case 2:
-                neighbors[1] = neighbors[2];
-                neighbors[2] = -1;
-                neighbors[3] = -1;
-                break;
-            case 3:
-                if (neighbors[1] < 0) {
-                    neighbors[1] = neighbors[2];
-                    neighbors[2] = neighbors[3];
-                }
-                neighbors[3] = -1;
-                break;
-        }
+        (*count) += (neighbors[*count] == id ||
+                     (*count != 0 && neighbors[(*count)-1] == neighbors[*count])) ? 0 : 1;
 
+        /* right */
+        if ((col == width - 1) || (row == max_row && id == last_id)) {
+            neighbors[*count] = row * width;
+        } else {
+            neighbors[*count] = row * width + col + 1;
+        }
+        (*count) += (neighbors[*count] == id ||
+                     (*count != 0 && neighbors[(*count)-1] == neighbors[*count])) ? 0 : 1;
+
+        size_t i;
+        for (i = *count; i < 4; ++i) {
+            neighbors[i] = -1;
+        }
         /* printf("\n neighbors: %d", neighbors[0]); */
         /* size_t i; */
         /* for (i = 1; i < 4; ++i) { */
@@ -186,8 +181,42 @@ int main(int argc, char *argv[])
     /* int * neighbors = setup_neighbors(id, p, &count); */
     /* if (neighbors) free(neighbors); */
 
-    Test_obj test_cases[] = {{1, 9, 4, 1, 2,  3,  4},
-                             {0, 3, 4, 1, 2, -1, -1},
+    Test_obj test_cases[] = {{0, 1, 0, -1, -1, -1, -1},
+                             {0, 2, 1,  1, -1, -1, -1},
+                             {1, 2, 1,  0, -1, -1, -1},
+                             {0, 3, 2,  2,  1, -1, -1},
+                             {1, 3, 1,  0, -1, -1, -1},
+                             {2, 3, 1,  0, -1, -1, -1},
+                             {0, 4, 2,  2,  1, -1, -1},
+                             {1, 4, 2,  3,  0, -1, -1},
+                             {2, 4, 2,  0,  3, -1, -1},
+                             {3, 4, 2,  1,  2, -1, -1},
+                             {0, 5, 3,  3,  2,  1, -1},
+                             {1, 5, 3,  4,  0,  2, -1},
+                             {2, 5, 2,  1,  0, -1, -1},
+                             {3, 5, 2,  0,  4, -1, -1},
+                             {4, 5, 2,  1,  3, -1, -1},
+                             {0, 6, 3,  3,  2,  1, -1},
+                             {1, 6, 3,  4,  0,  2, -1},
+                             {2, 6, 3,  5,  1,  0, -1},
+                             {3, 6, 3,  0,  5,  4, -1},
+                             {4, 6, 3,  1,  3,  5, -1},
+                             {5, 6, 3,  2,  4,  3, -1},
+                             {0, 7, 4,  6,  3,  2,  1},
+                             {1, 7, 3,  4,  0,  2, -1},
+                             {2, 7, 3,  5,  1,  0, -1},
+                             {3, 7, 4,  0,  6,  5,  4},
+                             {4, 7, 3,  1,  3,  5, -1},
+                             {5, 7, 3,  2,  4,  3, -1},
+                             {6, 7, 2,  3,  0, -1, -1},
+                             {0, 8, 4,  6,  3,  2,  1},
+                             {1, 8, 4,  7,  4,  0,  2},
+                             {2, 8, 3,  5,  1,  0, -1},
+                             {3, 8, 4,  0,  6,  5,  4},
+                             {4, 8, 4,  1,  7,  3,  5},
+                             {5, 8, 3,  2,  4,  3, -1},
+                             {6, 8, 3,  3,  0,  7, -1},
+                             {7, 8, 3,  4,  1,  6, -1},
                              {0, 0, 0, 0, 0, 0, 0}};
     size_t i;
     for (i = 0;
