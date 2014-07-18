@@ -2,7 +2,6 @@
 #include "utils.h"
 #include "io.h"
 
-
 PSO_status pso_init(func_type fn, const PSO_parameters * parameters)
 /* Initialization, return a brand new PSO_status */
 {
@@ -23,20 +22,40 @@ PSO_status pso_init(func_type fn, const PSO_parameters * parameters)
 void update_status(const PSO_parameters * parameters, PSO_status * swarm_status)
 /* update standard deviation, v_max, global_best */
 {
-    size_t index_best = swarm_status->index_best;
+    const size_t      count  = swarm_status->agents_count;
+    const size_t      dim    = swarm_status->dim;
+    const PSO_state * agents = swarm_status->agents_states;
+    const double      v_max  = swarm_status->v_max;
+    int           index_best = swarm_status->index_best;
+    double *          sd_pos = swarm_status->sd_pos;
+
     size_t i;
-    for (i = 0; i < parameters->agents_count; ++i) {
-        if (swarm_status->agents_states[i].val_best <= swarm_status->agents_states[index_best].val_best) {
+    for (i = 0; i < count; ++i) {
+        if (agents[i].val_best <= swarm_status->val_best) {
             index_best = i;
         }
     }
-    swarm_status->index_best = index_best;
-    swarm_status->pos_best   = swarm_status->agents_states[index_best].pos_best; /* shadow copy */
-    swarm_status->val_best   = swarm_status->agents_states[index_best].val_best;
+    if (index_best != swarm_status->index_best) {
+        swarm_status->index_best = index_best;
+        swarm_status->val_best   = agents[index_best].val_best;
+        memcpy(swarm_status->pos_best, agents[index_best].pos_best, sizeof(double) * dim);
+    }
 
-    update_sd_pos(swarm_status->sd_pos,  swarm_status->agents_states,
-                  parameters->dimension, parameters->agents_count);
-    swarm_status->v_max = new_v_max(swarm_status->sd_pos, swarm_status->dimension, swarm_status->v_max);
+    update_sd_pos(sd_pos, agents, dim, count);
+    swarm_status->v_max = new_v_max(sd_pos, dim, v_max);
+}
+
+int update_neighbor_data(PSO_status * swarm_status, const double * neighbor_data)
+{
+    const size_t dim = swarm_status->dimension;
+    if (neighbor_data[dim] < swarm_status->val_best) {
+        swarm_status->index_best = -1;
+        swarm_status->val_best   = neighbor_data[dim];
+        memcpy(swarm_status->pos_best, neighbor_data, sizeof(double) * dim);
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 void pso_iteration(func_type fn, const PSO_parameters * parameters, PSO_status * swarm_status)

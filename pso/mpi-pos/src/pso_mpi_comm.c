@@ -74,6 +74,68 @@ int * setup_neighbors(const int id, const int p, size_t * count)
     }
 }
 
+void pso_mpi_init(PSO_parameters * parameters)
+{
+    parameters->neighbors = setup_neighbors(parameters->id,
+                                            parameters->p,
+                                            &parameters->neighbors_count);
+    return;
+}
+
+double * neighbors_recv_update(const int    * neighbors,
+                               const size_t   count,
+                               const size_t * dim,
+                               size_t       * neighbors_best)
+{
+    const size_t pos_size   = sizeof(double) * dim;
+    const size_t data_size  = sizeof(double) * (dim + 1);
+    const size_t data_count = dim + 1;
+
+    double * data = alloca(data_size);
+    double * neighbors_data = NULL;
+
+    MPI_Status status;
+    size_t i;
+    int flag = 0;
+    for (i = 0; i < count; ++i) {
+        MPI_Iprobe(neighbors[i], 0, MPI_COMM_WORLD, &flag, &status);
+        if (flag) {
+            MPI_Recv(&data, data_count, MPI_DOUBLE, neighbors[i], 0, MPI_COMM_WORLD, &status);
+            if (neighbors_data) {
+                if (data[dim] < neighbors_data[dim]) {
+                    memcpy(neighbors_data, data, data_size);
+                    *neighbors_best = i;
+                }
+            } else {
+                neighbors_data = malloc(data_size);
+                memcpy(neighbors_data, data, data_size);
+                *neighbors_best = i;
+            }
+        }
+    }
+    if (!neighbors_data) {
+        return data;
+    } else {
+        free(data);
+        return NULL;
+    }
+}
+
+void neighbors_send_update(const PSO_status * swarm_status,
+                           const int        * neighbors,
+                           const size_t       count)
+{
+    const size_t dim = swarm_status->dimension;
+    double * data    = alloca(sizeof(double) * (dim + 1));
+    memcpy(data, swarm_status->pos_best, sizeof(double) * dim);
+    data[dim] = swarm_status->val_best;
+    size_t i;
+    for (i = 0; i < count; ++i) {
+        MPI_Send((void *)data, dim + 1, MPI_DOUBLE, neighbors[i], 0, MPI_COMM_WORLD);
+    }
+    return;
+}
+
 void update_status_mpi(const PSO_parameters * parameters, PSO_status * swarm_status)
 {
 }

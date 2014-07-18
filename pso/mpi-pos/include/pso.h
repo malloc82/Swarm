@@ -26,6 +26,7 @@ typedef struct {
     int         id; /* Used for MPI */
     int         p;
     int       * neighbors;
+    size_t      neighbors_count;
 #endif
     size_t      dimension;
     PSO_range * ranges;
@@ -49,7 +50,7 @@ typedef struct {
     PSO_state * agents_states;
     double    * sd_pos;
     double      v_max;
-    size_t      index_best;
+    int         index_best;
     double    * pos_best;
     double      val_best;
 } PSO_status;
