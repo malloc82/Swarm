@@ -1,4 +1,4 @@
-#include "pso_mpi.h"
+#include "pso_comm.h"
 
 int * setup_neighbors(const int id, const int p, size_t * count)
 {
@@ -134,8 +134,4 @@ void neighbors_send_update(const PSO_status * swarm_status,
         MPI_Send((void *)data, dim + 1, MPI_DOUBLE, neighbors[i], 0, MPI_COMM_WORLD);
     }
     return;
-}
-
-void update_status_mpi(const PSO_parameters * parameters, PSO_status * swarm_status)
-{
 }

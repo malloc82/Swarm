@@ -22,10 +22,10 @@ PSO_status pso_init(func_type fn, const PSO_parameters * parameters)
 void update_status(const PSO_parameters * parameters, PSO_status * swarm_status)
 /* update standard deviation, v_max, global_best */
 {
-    const size_t      count  = swarm_status->agents_count;
-    const size_t      dim    = swarm_status->dim;
+    const size_t       count = swarm_status->agents_count;
+    const size_t         dim = swarm_status->dim;
     const PSO_state * agents = swarm_status->agents_states;
-    const double      v_max  = swarm_status->v_max;
+    const double       v_max = swarm_status->v_max;
     int           index_best = swarm_status->index_best;
     double *          sd_pos = swarm_status->sd_pos;
 

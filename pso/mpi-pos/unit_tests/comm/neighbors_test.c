@@ -12,79 +12,79 @@ static struct option input_options[] = {
     {0,0,0,0}
 };
 
-int * setup_neighbors(const int id, const int p, size_t * count)
-{
-    if (id >= 0 && p > 0) {
-        int * neighbors = malloc(sizeof(int) * 4);
+/* int * setup_neighbors(const int id, const int p, size_t * count) */
+/* { */
+/*     if (id >= 0 && p > 0) { */
+/*         int * neighbors = malloc(sizeof(int) * 4); */
 
-        const int width   = ceil(sqrt(p));
-        const int last_id = p - 1;
-        const int row     = id / width;
-        const int col     = id % width;
-        const int max_row = last_id / width;
-        const int max_col = last_id % width;
+/*         const int width   = ceil(sqrt(p)); */
+/*         const int last_id = p - 1; */
+/*         const int row     = id / width; */
+/*         const int col     = id % width; */
+/*         const int max_row = last_id / width; */
+/*         const int max_col = last_id % width; */
 
-        /* printf("\n width = %d", width); */
-        /* printf("\n row = %d, col = %d", row, col); */
-        /* printf("\n max_row = %d, max_col = %d", max_row, max_col); */
+/*         /\* printf("\n width = %d", width); *\/ */
+/*         /\* printf("\n row = %d, col = %d", row, col); *\/ */
+/*         /\* printf("\n max_row = %d, max_col = %d", max_row, max_col); *\/ */
 
-        *count = 0;
-        /* up */
-        if (row == 0) {
-            if (col <= max_col) {
-                neighbors[*count] = max_row * width + col;
-            } else {
-                neighbors[*count] = (max_row - 1) * width + col;
-            }
-        } else {
-            neighbors[*count] = (row - 1) * width + col;
-        }
-        (*count) += (neighbors[*count] == id) ? 0 : 1; /* update count */
+/*         *count = 0; */
+/*         /\* up *\/ */
+/*         if (row == 0) { */
+/*             if (col <= max_col) { */
+/*                 neighbors[*count] = max_row * width + col; */
+/*             } else { */
+/*                 neighbors[*count] = (max_row - 1) * width + col; */
+/*             } */
+/*         } else { */
+/*             neighbors[*count] = (row - 1) * width + col; */
+/*         } */
+/*         (*count) += (neighbors[*count] == id) ? 0 : 1; /\* update count *\/ */
 
-        /* down */
-        if (row == max_row || col > max_col) {
-            neighbors[*count] = col;
-        } else {
-            neighbors[*count] = (row + 1) * width + col;
-        }
-        (*count) += (neighbors[*count] == id ||
-                     (*count != 0 && neighbors[(*count)-1] == neighbors[*count])) ? 0 : 1;
+/*         /\* down *\/ */
+/*         if (row == max_row || col > max_col) { */
+/*             neighbors[*count] = col; */
+/*         } else { */
+/*             neighbors[*count] = (row + 1) * width + col; */
+/*         } */
+/*         (*count) += (neighbors[*count] == id || */
+/*                      (*count != 0 && neighbors[(*count)-1] == neighbors[*count])) ? 0 : 1; */
 
-        /* left */
-        if (col == 0) {
-            neighbors[*count] = (row < max_row) ? (row + 1) * width - 1 : last_id;
-        } else {
-            neighbors[*count] = row * width + (col - 1);
-        }
-        (*count) += (neighbors[*count] == id ||
-                     (*count != 0 && neighbors[(*count)-1] == neighbors[*count])) ? 0 : 1;
+/*         /\* left *\/ */
+/*         if (col == 0) { */
+/*             neighbors[*count] = (row < max_row) ? (row + 1) * width - 1 : last_id; */
+/*         } else { */
+/*             neighbors[*count] = row * width + (col - 1); */
+/*         } */
+/*         (*count) += (neighbors[*count] == id || */
+/*                      (*count != 0 && neighbors[(*count)-1] == neighbors[*count])) ? 0 : 1; */
 
-        /* right */
-        if ((col == width - 1) || (row == max_row && id == last_id)) {
-            neighbors[*count] = row * width;
-        } else {
-            neighbors[*count] = row * width + col + 1;
-        }
-        (*count) += (neighbors[*count] == id ||
-                     (*count != 0 && neighbors[(*count)-1] == neighbors[*count])) ? 0 : 1;
+/*         /\* right *\/ */
+/*         if ((col == width - 1) || (row == max_row && id == last_id)) { */
+/*             neighbors[*count] = row * width; */
+/*         } else { */
+/*             neighbors[*count] = row * width + col + 1; */
+/*         } */
+/*         (*count) += (neighbors[*count] == id || */
+/*                      (*count != 0 && neighbors[(*count)-1] == neighbors[*count])) ? 0 : 1; */
 
-        size_t i;
-        for (i = *count; i < 4; ++i) {
-            neighbors[i] = -1;
-        }
-        /* printf("\n neighbors: %d", neighbors[0]); */
-        /* size_t i; */
-        /* for (i = 1; i < 4; ++i) { */
-        /*     if (neighbors[i] >=0 ) */
-        /*         printf(", %d", neighbors[i]); */
-        /* } */
-        /* puts("\n"); */
-        return neighbors;
-    } else {
-        printf("\n Failure: Id needs to be non-negative, p needs to be positive \n");
-        return NULL;
-    }
-}
+/*         size_t i; */
+/*         for (i = *count; i < 4; ++i) { */
+/*             neighbors[i] = -1; */
+/*         } */
+/*         /\* printf("\n neighbors: %d", neighbors[0]); *\/ */
+/*         /\* size_t i; *\/ */
+/*         /\* for (i = 1; i < 4; ++i) { *\/ */
+/*         /\*     if (neighbors[i] >=0 ) *\/ */
+/*         /\*         printf(", %d", neighbors[i]); *\/ */
+/*         /\* } *\/ */
+/*         /\* puts("\n"); *\/ */
+/*         return neighbors; */
+/*     } else { */
+/*         printf("\n Failure: Id needs to be non-negative, p needs to be positive \n"); */
+/*         return NULL; */
+/*     } */
+/* } */
 
 typedef struct {
     int id;
