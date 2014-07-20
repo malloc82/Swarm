@@ -82,10 +82,10 @@ void pso_mpi_init(PSO_parameters * parameters)
     return;
 }
 
-double * neighbors_recv_update(const int    * neighbors,
-                               const size_t   count,
-                               const size_t * dim,
-                               size_t       * neighbors_best)
+double * neighbors_recv_update(const int  * neighbors,
+                               const size_t count,
+                               const size_t dim,
+                               size_t     * neighbors_best)
 {
     const size_t pos_size   = sizeof(double) * dim;
     const size_t data_size  = sizeof(double) * (dim + 1);

@@ -5,86 +5,14 @@
 #include <math.h>
 #include <string.h>
 
+#include "pso_comm.h"
+
 extern char * optarg;
 
 static struct option input_options[] = {
     {"id", required_argument, 0, 'd'},
     {0,0,0,0}
 };
-
-/* int * setup_neighbors(const int id, const int p, size_t * count) */
-/* { */
-/*     if (id >= 0 && p > 0) { */
-/*         int * neighbors = malloc(sizeof(int) * 4); */
-
-/*         const int width   = ceil(sqrt(p)); */
-/*         const int last_id = p - 1; */
-/*         const int row     = id / width; */
-/*         const int col     = id % width; */
-/*         const int max_row = last_id / width; */
-/*         const int max_col = last_id % width; */
-
-/*         /\* printf("\n width = %d", width); *\/ */
-/*         /\* printf("\n row = %d, col = %d", row, col); *\/ */
-/*         /\* printf("\n max_row = %d, max_col = %d", max_row, max_col); *\/ */
-
-/*         *count = 0; */
-/*         /\* up *\/ */
-/*         if (row == 0) { */
-/*             if (col <= max_col) { */
-/*                 neighbors[*count] = max_row * width + col; */
-/*             } else { */
-/*                 neighbors[*count] = (max_row - 1) * width + col; */
-/*             } */
-/*         } else { */
-/*             neighbors[*count] = (row - 1) * width + col; */
-/*         } */
-/*         (*count) += (neighbors[*count] == id) ? 0 : 1; /\* update count *\/ */
-
-/*         /\* down *\/ */
-/*         if (row == max_row || col > max_col) { */
-/*             neighbors[*count] = col; */
-/*         } else { */
-/*             neighbors[*count] = (row + 1) * width + col; */
-/*         } */
-/*         (*count) += (neighbors[*count] == id || */
-/*                      (*count != 0 && neighbors[(*count)-1] == neighbors[*count])) ? 0 : 1; */
-
-/*         /\* left *\/ */
-/*         if (col == 0) { */
-/*             neighbors[*count] = (row < max_row) ? (row + 1) * width - 1 : last_id; */
-/*         } else { */
-/*             neighbors[*count] = row * width + (col - 1); */
-/*         } */
-/*         (*count) += (neighbors[*count] == id || */
-/*                      (*count != 0 && neighbors[(*count)-1] == neighbors[*count])) ? 0 : 1; */
-
-/*         /\* right *\/ */
-/*         if ((col == width - 1) || (row == max_row && id == last_id)) { */
-/*             neighbors[*count] = row * width; */
-/*         } else { */
-/*             neighbors[*count] = row * width + col + 1; */
-/*         } */
-/*         (*count) += (neighbors[*count] == id || */
-/*                      (*count != 0 && neighbors[(*count)-1] == neighbors[*count])) ? 0 : 1; */
-
-/*         size_t i; */
-/*         for (i = *count; i < 4; ++i) { */
-/*             neighbors[i] = -1; */
-/*         } */
-/*         /\* printf("\n neighbors: %d", neighbors[0]); *\/ */
-/*         /\* size_t i; *\/ */
-/*         /\* for (i = 1; i < 4; ++i) { *\/ */
-/*         /\*     if (neighbors[i] >=0 ) *\/ */
-/*         /\*         printf(", %d", neighbors[i]); *\/ */
-/*         /\* } *\/ */
-/*         /\* puts("\n"); *\/ */
-/*         return neighbors; */
-/*     } else { */
-/*         printf("\n Failure: Id needs to be non-negative, p needs to be positive \n"); */
-/*         return NULL; */
-/*     } */
-/* } */
 
 typedef struct {
     int id;
@@ -115,9 +43,10 @@ int check_test_case(const int test_id, const Test_obj * obj)
     int error = 0;
     size_t count, i;
     int * neighbors = setup_neighbors(obj->id, obj->p, &count);
-    char   test_str[64];
-    char   space_str[64];
-    size_t test_str_len;
+    char test_str[64];
+    char space_str[64];
+    int  test_str_len;
+    int  retval = 1;
     sprintf(test_str, "==> test case (%03d): id = %03d, p = %03d ::: ", test_id, obj->id, obj->p);
     test_str_len = strlen(test_str);
 
@@ -137,22 +66,23 @@ int check_test_case(const int test_id, const Test_obj * obj)
     }
     if (error == 0) {
         printf("\n %s Success: id = %d, p = %d", test_str, obj->id, obj->p);
+        retval = 0;
     } else {
         printf("\n %s Failure: id = %d, p = %d, error = %d", test_str, obj->id, obj->p, error);
-        printf("\n %*s expected: (%d)", test_str_len, " ", obj->count);
+        printf("\n %*s expected: (%lu)", test_str_len, " ", obj->count);
         for (i = 0; i < obj->count; ++i) {
             printf(" %d", obj->neighbors[i]);
         }
-        printf("\n %*s      got: (%d)", test_str_len, " ", count);
+        printf("\n %*s      got: (%lu)", test_str_len, " ", count);
         for (i = 0; i < count; ++i) {
             printf(" %d", neighbors[i]);
         }
+        retval = 1;
     }
     if (neighbors)
         free(neighbors);
-    return;
+    return retval;
 }
-
 
 int main(int argc, char *argv[])
 {
