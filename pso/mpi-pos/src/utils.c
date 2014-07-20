@@ -78,7 +78,7 @@ double randrange(const double lo, const double hi) {
     return lo + (hi - lo)*((double)rand_val/UINT_MAX);
 }
 
-double * rand_array_varying_range(const PSO_range * ranges, const size_t len)
+double * rand_array_varying_range(const Range * ranges, const size_t len)
 {
     size_t         data_size   = len*sizeof(unsigned int);
     size_t         len_written = 0;

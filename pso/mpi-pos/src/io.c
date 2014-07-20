@@ -74,7 +74,7 @@ void read_parameter_range(const char * input, PSO_parameters * parameters)
     strncpy(input_str, input, input_len); /* reset */
 
     parameters->dimension = i;
-    parameters->ranges = malloc(sizeof(PSO_range)*i);
+    parameters->ranges = malloc(sizeof(Range)*i);
 
     for (i = 0, token = strtok(input_str, ";"); token != NULL; ++i, token = strtok(NULL, ";")) {
         items_read = sscanf(token, "%lf,%lf", &parameters->ranges[i].lo, &parameters->ranges[i].hi);

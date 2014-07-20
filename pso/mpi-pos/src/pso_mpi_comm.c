@@ -87,12 +87,12 @@ double * neighbors_recv_update(const int  * neighbors,
                                const size_t dim,
                                size_t     * neighbors_best)
 {
-    const size_t pos_size   = sizeof(double) * dim;
+    /* const size_t pos_size   = sizeof(double) * dim; */
     const size_t data_size  = sizeof(double) * (dim + 1);
     const size_t data_count = dim + 1;
 
-    double * data = alloca(data_size);
-    double * neighbors_data = NULL;
+    double * incoming_data       = malloc(data_size);
+    double * best_neighbors_data = NULL;
 
     MPI_Status status;
     size_t i;
@@ -100,25 +100,22 @@ double * neighbors_recv_update(const int  * neighbors,
     for (i = 0; i < count; ++i) {
         MPI_Iprobe(neighbors[i], 0, MPI_COMM_WORLD, &flag, &status);
         if (flag) {
-            MPI_Recv(&data, data_count, MPI_DOUBLE, neighbors[i], 0, MPI_COMM_WORLD, &status);
-            if (neighbors_data) {
-                if (data[dim] < neighbors_data[dim]) {
-                    memcpy(neighbors_data, data, data_size);
+            MPI_Recv(incoming_data, data_count, MPI_DOUBLE, neighbors[i], 0,
+                     MPI_COMM_WORLD, &status);
+            if (best_neighbors_data) {
+                if (incoming_data[dim] < best_neighbors_data[dim]) {
+                    memcpy(best_neighbors_data, incoming_data, data_size);
                     *neighbors_best = i;
                 }
             } else {
-                neighbors_data = malloc(data_size);
-                memcpy(neighbors_data, data, data_size);
+                best_neighbors_data = malloc(data_size);
+                memcpy(best_neighbors_data, incoming_data, data_size);
                 *neighbors_best = i;
             }
         }
     }
-    if (!neighbors_data) {
-        return data;
-    } else {
-        free(data);
-        return NULL;
-    }
+    free(incoming_data);
+    return best_neighbors_data;
 }
 
 void neighbors_send_update(const PSO_status * swarm_status,
@@ -130,8 +127,15 @@ void neighbors_send_update(const PSO_status * swarm_status,
     memcpy(data, swarm_status->pos_best, sizeof(double) * dim);
     data[dim] = swarm_status->val_best;
     size_t i;
+    for (i = 0; i < dim + 1; ++i) {
+        printf("\n data[%lu] = %f", i, data[i]);
+    }
+    puts("");
     for (i = 0; i < count; ++i) {
+        printf("\n send to %d.", neighbors[i]);
         MPI_Send((void *)data, dim + 1, MPI_DOUBLE, neighbors[i], 0, MPI_COMM_WORLD);
     }
+    printf("\n ===> done1");
+    fflush(stdout);
     return;
 }

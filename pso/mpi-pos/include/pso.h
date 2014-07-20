@@ -19,23 +19,23 @@
 typedef struct {
     double lo;
     double hi;
-} PSO_range;
+} Range;
 
 typedef struct {
 #ifdef PSO_MPI
-    int         id; /* Used for MPI */
-    int         p;
-    int       * neighbors;
-    size_t      neighbors_count;
+    int     id;                 /* Used for MPI */
+    int     p;
+    int   * neighbors;
+    size_t  neighbors_count;
 #endif
-    size_t      dimension;
-    PSO_range * ranges;
-    size_t      agents_count;
-    double      precision;
-    size_t      max_runs;
-    double      w;
-    double      a1;
-    double      a2;
+    size_t  dimension;
+    Range * ranges;
+    size_t  agents_count;
+    double  precision;
+    size_t  max_runs;
+    double  w;
+    double  a1;
+    double  a2;
 } PSO_parameters;
 
 typedef struct {

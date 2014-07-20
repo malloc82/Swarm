@@ -15,7 +15,7 @@ double sd(const double * x, const size_t);
 
 double randrange(const double, const double);
 
-double * rand_array_varying_range(const PSO_range *, const size_t);
+double * rand_array_varying_range(const Range *, const size_t);
 
 double * rand_array_fixed_range(const double, const double, const size_t);
 
