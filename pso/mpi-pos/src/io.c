@@ -94,6 +94,38 @@ void read_parameter_range(const char * input, PSO_parameters * parameters)
     return;
 }
 
+double * read_parameter_double_array(const char * input, size_t * n)
+{
+    if (!input) {
+        fprintf(stderr, "Expecting argument for double array, not found. quit.\n");
+#ifdef PSO_MPI
+        MPI_Finalize();
+#endif
+        exit(EXIT_FAILURE);
+    }
+    const size_t input_len = strlen(input) + 1;
+    size_t items_read = 0, i = 0;
+    char * token = NULL;
+    char * input_str = alloca(sizeof(char) * input_len);
+    strncpy(input_str, input, input_len);
+    /* finding array length */
+    for (i = 0, token = strtok(input_str, ", "); token != NULL; ++i, token = strtok(NULL, ", "));
+    const size_t data_count = i;
+    if (data_count > 0){
+        double * data = malloc(sizeof(double) * data_count);
+        /* reset for parsing */
+        strncpy(input_str, input, input_len);
+
+        for (i = 0, token = strtok(input_str, ", "); token != NULL; ++i, token = strtok(NULL, ", ")) {
+            items_read = sscanf(token, "%lf", data + i);
+        }
+        *n = data_count;
+        return data;
+    } else {
+        return NULL;
+    }
+}
+
 void read_parameter_data_double(const char * input,  double ** data, const size_t n)
 {
     if (!input) {

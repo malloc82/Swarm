@@ -11,7 +11,7 @@ func_type read_parameter_func_type(const char *, const char *);
 
 void read_parameter_range(const char *, PSO_parameters *);
 
-void read_parameter_data_double(const char *,  double **, const size_t);
+double * read_parameter_double_array(const char *, size_t *);
 
 void print_parameters(const PSO_parameters *);
 

@@ -2,24 +2,21 @@
 SHELL   := /bin/bash
 CURDIR  := $(shell pwd)
 
-SRCDIR  := $(CURDIR)/../src
+SRCDIR  := $(CURDIR)/../../src
 TESTDIR := $(CURDIR)
-INCLUDE := -I $(CURDIR)/../include
+INCLUDE := -I $(CURDIR)/../../include
 OBJDIR  := $(CURDIR)/obj
-BINDIR  := $(TESTDIR)/../bin
+BINDIR  := $(CURDIR)/bin
 
 COMMON_SRC := $(SRCDIR)/functions.c $(SRCDIR)/utils.c $(SRCDIR)/io.c
-TEST_SRC   := $(TESTDIR)/fn_tests.c
 COMMON_OBJ := $(patsubst %.c,$(OBJDIR)/%.c.o,$(notdir $(COMMON_SRC)))
-TEST_OBJ   := $(patsubst %.c,$(OBJDIR)/%.c.o,$(notdir $(TEST_SRC)))
-LIB        := -lm
 DEBUG      := -g
 
 MPICC   := $(shell which mpicc) # /opt/local/bin/mpicc-openmpi-mp
 MPIRUN  := $(shell which mpirun)
 CC      := $(shell $(MPICC) --showme:command)
-CFLAGS  := # $(shell $(MPICC) --showme:compile)
-LDFLAGS := # $(shell $(MPICC) --showme:link)
+CFLAGS  := -Wall # $(shell $(MPICC) --showme:compile)
+LDFLAGS := -lm # $(shell $(MPICC) --showme:link)
 
 ACKLEY_SRC    := $(TESTDIR)/ackley.c
 ACKLEY_OBJ    := $(patsubst %.c,$(OBJDIR)/%.c.o,$(notdir $(ACKLEY_SRC)))
@@ -35,11 +32,11 @@ RASTRIGIN_EXEC := $(BINDIR)/rastrigin
 
 compile: makedirectories ackley_bin michal_bin rastrigin_bin
 
-ackley_bin:  $(ACKLEY_EXEC)
+ackley_bin:    $(ACKLEY_EXEC)
 
-michal_bin:  $(MICHAL_EXEC)
+michal_bin:    $(MICHAL_EXEC)
 
-rastrigin_bin:  $(RASTRIGIN_EXEC)
+rastrigin_bin: $(RASTRIGIN_EXEC)
 
 $(ACKLEY_EXEC): $(COMMON_SRC) $(ACKLEY_SRC) $(COMMON_OBJ) $(ACKLEY_OBJ)
 	$(VERBOSE) $(CC) $(LIB) $(LDFLAGS) $(COMMON_OBJ) $(ACKLEY_OBJ) -o $@
@@ -49,10 +46,6 @@ $(MICHAL_EXEC): $(COMMON_SRC) $(MICHAL_SRC) $(COMMON_OBJ) $(MICHAL_OBJ)
 
 $(RASTRIGIN_EXEC): $(COMMON_SRC) $(RASTRIGIN_SRC) $(COMMON_OBJ) $(RASTRIGIN_OBJ)
 	$(VERBOSE) $(CC) $(LIB) $(LDFLAGS) $(COMMON_OBJ) $(RASTRIGIN_OBJ) -o $@
-
-
-# $(EXEC): $(SRC) $(TESTSRC) $(OBJ)
-# 	$(VERBOSE) $(CC) $(LIB) $(LDFLAGS) $(OBJ) -o $@
 
 $(OBJDIR)/%.c.o: $(SRCDIR)/%.c
 	$(VERBOSE) $(CC) $(DEBUG) $(CFLAGS) $(INCLUDE) -c $< -o $@
