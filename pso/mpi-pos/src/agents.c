@@ -78,6 +78,7 @@ PSO_state * free_agents(PSO_state * agents, const PSO_parameters * parameters)
 void clear_status(PSO_status * swarm_status, const PSO_parameters * parameters)
 {
     swarm_status->agents_states = free_agents(swarm_status->agents_states, parameters);
+    free(swarm_status->pos_best);
     swarm_status->pos_best      = NULL;
     free(swarm_status->sd_pos);
     swarm_status->sd_pos = NULL;

@@ -50,7 +50,7 @@ compile_seq: makedirectories $(SEQ_EXEC)
 
 compile_mpi: makedirectories $(MPI_EXEC)
 
-run:
+mpi_run:
 	$(MPIRUN) -np 2 $(EXEC) 
 
 # Rules for compiling sequential code

@@ -47,6 +47,7 @@ typedef struct {
 
 typedef struct {
     size_t      dimension;
+    size_t      agents_count;
     PSO_state * agents_states;
     double    * sd_pos;
     double      v_max;
@@ -58,7 +59,7 @@ typedef struct {
 /* search */
 PSO_status pso_init(func_type, const PSO_parameters *);
 
-void update_status(const PSO_parameters *, PSO_status *);
+void update_status(PSO_status *);
 
 void pso_iteration(func_type, const PSO_parameters *, PSO_status *);
 

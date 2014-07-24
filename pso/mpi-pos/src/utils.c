@@ -23,7 +23,7 @@ double norm1(const double * v, const size_t n)
 
 double norm2(const double * v, const size_t n)
 {
-    int i;
+    size_t i;
     double sum = 0;
     for (i = 0; i < n; ++i) {
         const double x = v[i];
