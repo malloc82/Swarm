@@ -9,6 +9,8 @@ double norm1(const double *, const size_t);
 
 double norm2(const double *, const size_t);
 
+double mean(const double *, const size_t);
+
 void normalize(double, const size_t);
 
 double sd(const double * x, const size_t);

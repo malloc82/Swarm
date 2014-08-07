@@ -76,10 +76,14 @@ void update_sd_pos(double *, const PSO_state *, const size_t, const size_t);
 
 PSO_state * init_agents(func_type, const PSO_parameters *);
 
-PSO_state * free_agents(PSO_state * agents, const PSO_parameters *);
+PSO_state * free_agents(PSO_state *, const PSO_parameters *);
 
 void clear_status(PSO_status *, const PSO_parameters *);
 
 void clear_parameters(PSO_parameters *);
+
+#include "profiler.h"
+
+void update_pso_profiler(TEST_PROFILER *, const PSO_status *);
 
 #endif // PSO

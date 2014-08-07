@@ -32,6 +32,16 @@ double norm2(const double * v, const size_t n)
     return sqrt(sum);
 }
 
+double mean(const double * v, const size_t n)
+{
+    size_t i;
+    register double sum = 0;
+    for (i = 0; i < n; ++i) {
+        sum += v[i];
+    }
+    return sum / n;
+}
+
 void normalize(double * v, const size_t n)
 {
     if (!v && !n) return;

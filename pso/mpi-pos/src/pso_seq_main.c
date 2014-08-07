@@ -1,6 +1,7 @@
 #include "pso.h"
 #include "test_fns.h"
 #include "io.h"
+#include "profiler.h"
 
 #include <getopt.h>
 
@@ -15,18 +16,22 @@ static struct option pso_options[] = {
     {"a1",           required_argument, 0, 'a'},
     {"a2",           required_argument, 0, 'b'},
     {"test_runs",    required_argument, 0, 't'},
+    {"verbose",      no_argument,       0, 'v'},
+    {"expected",     required_argument, 0, 'e'},
     {0, 0, 0, 0}
 };
 
 int main(int argc, char *argv[])
 {
-    int c, longindex;
+    int c, longindex, verbose = 0;
     func_type fn = NULL;
     size_t i;
     size_t test_runs = 1;
     PSO_parameters parameters = {0, 0, 0, 0, 0, 0, 0, 0};
+    double expected = 0;
+    TEST_PROFILER profiler = {0};
 
-    while ((c = getopt_long(argc, argv, "w:a:b:", pso_options, &longindex)) != -1) {
+    while ((c = getopt_long(argc, argv, "w:a:b:v", pso_options, &longindex)) != -1) {
         switch (c) {
             case 'f': /* function select */
                 fn = read_parameter_func_type(optarg, "function");
@@ -58,7 +63,13 @@ int main(int argc, char *argv[])
                 parameters.a2 = read_parameter_double(optarg, "a2");
                 break;
             case 't':
-                test_runs = read_parameter_size_t(optarg, "test runs");
+                profiler.total_runs = read_parameter_size_t(optarg, "test runs");
+                break;
+            case 'e':
+                profiler.expected = read_parameter_double(optarg, "expected");
+                break;
+            case 'v':
+                verbose = 1;
                 break;
             default:
                 fprintf(stderr, "Unrecognized flag %c ... abort\n", c);
@@ -75,17 +86,20 @@ int main(int argc, char *argv[])
 
     printf("*********************************************************************\n");
     printf(" start search : \n\n");
-    for (i = 0; i < test_runs; ++i) {
+    for (profiler.completed = 0; i < profiler.total_runs; ++(profiler.completed)) {
         PSO_status result = pso_search(fn, &parameters);
+        update_pso_profiler(&profiler, &result);
         /* printf("   pso search (%lu) result = %lf, ", i, result.val_best); */
         /* print_double_vec("pos", result.pos_best, parameters.dimension); */
-        pso_print_result(i, result.pos_best, parameters.dimension, result.val_best);
+        if (verbose)
+            pso_print_result(i, result.pos_best, parameters.dimension, result.val_best);
         clear_status(&result, &parameters);
     }
 
     printf("*********************************************************************\n");
 
+    profiler_report(&profiler);
     clear_parameters(&parameters);
-
+    release_profiler(&profiler);
     return 0;
 }

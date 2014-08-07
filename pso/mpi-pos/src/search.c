@@ -124,3 +124,14 @@ PSO_status pso_search(func_type fn, const PSO_parameters * parameters)
     }
     return swarm_status;
 }
+
+void update_pso_profiler(TEST_PROFILER * profiler, const PSO_status * result)
+{
+    profiler->calculated[(profiler->completed)++] = result->val_best;
+    if (result->val_best - profiler->expected < 0.05) {
+        ++(profiler->success_count);
+    } else {
+        ++(profiler->failure_count);
+    }
+    return;
+}
