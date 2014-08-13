@@ -11,15 +11,9 @@
 #include <unistd.h>
 #include <string.h>
 #include "test_fns.h"
-
-#define PI 3.14159265359
-#define E  2.7182818284
+#include "utils.h"
 
 /* PSO types */
-typedef struct {
-    double lo;
-    double hi;
-} Range;
 
 typedef struct {
 #ifdef PSO_MPI

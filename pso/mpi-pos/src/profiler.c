@@ -1,4 +1,7 @@
+#include <stdio.h>
+#include <string.h>
 #include "profiler.h"
+#include "utils.h"
 
 TEST_PROFILER new_profiler(const double expected, const size_t runs)
 {
@@ -7,6 +10,18 @@ TEST_PROFILER new_profiler(const double expected, const size_t runs)
     profiler.expected      = expected;
     profiler.calculated    = malloc(runs * sizeof(double));
     return profiler;
+}
+
+void profiler_update_runs(TEST_PROFILER * profiler, const size_t runs)
+{
+    double * new_calculated = malloc(runs * sizeof(double));
+    if (profiler->total_runs < runs && profiler->calculated != NULL) {
+        memcpy(new_calculated, profiler->calculated, (profiler->total_runs) * sizeof(double));
+    }
+    profiler->total_runs = runs;
+    if (profiler->calculated)
+        free(profiler->calculated);
+    profiler->calculated = new_calculated;
 }
 
 void profiler_summarize(TEST_PROFILER * profiler)
@@ -24,11 +39,11 @@ void profiler_report(const TEST_PROFILER * profiler)
     printf("\n  Peport:");
     printf("\n     Completed      : %lu/%lu", profiler->completed, profiler->total_runs);
     printf("\n     Expected value : %lf", profiler->expected);
-    printf("\n     Success        : %lf/%lf (%lf\%)",
+    printf("\n     Success        : %lu/%lu (%lf%%)",
            profiler->success_count,
            profiler->completed,
            profiler->success_rate);
-    printf("\n     Failure        : %lf/%lf (%lf\%)",
+    printf("\n     Failure        : %lu/%lu (%lf%%)",
            profiler->failure_count,
            profiler->completed,
            profiler->failure_rate);
@@ -56,11 +71,11 @@ void merge_profiler(TEST_PROFILER * dest, const TEST_PROFILER * src)
     dest->total_runs    += src->total_runs;
     dest->completed     += src->completed;
     dest->success_count += src->success_count;
-    dest->failure_count += src->Failure_count;
+    dest->failure_count += src->failure_count;
     return;
 }
 
-void release_profiler(const TEST_PROFILER * profiler)
+void release_profiler(TEST_PROFILER * profiler)
 {
     if (profiler->calculated) {
         free(profiler->calculated);

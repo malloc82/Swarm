@@ -1,7 +1,8 @@
 #ifndef PROFILER_H
 #define PROFILER_H
 
-#include "pso.h"
+#include <stdlib.h>
+#include <sys/types.h>
 
 typedef struct {
     /* raw data */
@@ -18,7 +19,7 @@ typedef struct {
     double failure_rate;
 } TEST_PROFILER;
 
-TEST_PROFILER new_profiler(const size_t);
+TEST_PROFILER new_profiler(const double, const size_t);
 
 /* void update_profiler_rates(TEST_PROFILER *); */
 

@@ -16,7 +16,8 @@ SEQ_SRC := $(SRCDIR)/pso_seq_main.c \
 		   $(SRCDIR)/agents.c \
 		   $(SRCDIR)/functions.c \
 		   $(SRCDIR)/utils.c \
-		   $(SRCDIR)/io.c
+		   $(SRCDIR)/io.c \
+		   $(SRCDIR)/profiler.c
 
 SEQ_OBJDIR := $(CURDIR)/obj_seq
 SEQ_OBJ    := $(patsubst %.c,$(SEQ_OBJDIR)/%.c.o,$(notdir $(SEQ_SRC)))
@@ -32,7 +33,8 @@ MPI_SRC := $(SRCDIR)/pso_mpi_main.c \
 		   $(SRCDIR)/agents.c \
 		   $(SRCDIR)/functions.c \
 		   $(SRCDIR)/utils.c \
-		   $(SRCDIR)/io.c
+		   $(SRCDIR)/io.c \
+		   $(SRCDIR)/profiler.c
 
 MPI_OBJDIR  := $(CURDIR)/obj_mpi
 MPI_OBJ     := $(patsubst %.c,$(MPI_OBJDIR)/%.c.o,$(notdir $(MPI_SRC)))
@@ -80,9 +82,19 @@ makedirectories:
 	$(VERBOSE) mkdir -p $(SEQ_OBJDIR)
 	$(VERBOSE) mkdir -p $(MPI_OBJDIR)
 
-clean_all:
+clean:
 	$(VERBOSE) rm -rf $(SEQ_OBJDIR) $(MPI_OBJDIR) $(SEQ_EXEC) $(MPI_EXEC)
-clean_mpi: 
+mpi_clean: 
 	$(VERBOSE) rm -rf $(MPI_OBJDIR) $(MPI_EXEC)
-clean_seq:
+seq_clean:
 	$(VERBOSE) rm -rf $(SEQ_OBJDIR)  $(SEQ_EXEC)
+seq_run:	
+	$(SEQ_EXEC) --ranges="-5,5;-5,5" \
+				--agents_count=100 \
+				--precision=0.001 \
+				--max_runs=100 \
+				--fn=rastrigin \
+				-w 1 -a 1 -b 2 \
+				--expected=0.0 \
+				--test_runs=20 \
+				--verbose

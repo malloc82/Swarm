@@ -25,11 +25,8 @@ int main(int argc, char *argv[])
 {
     int c, longindex, verbose = 0;
     func_type fn = NULL;
-    size_t i;
-    size_t test_runs = 1;
     PSO_parameters parameters = {0, 0, 0, 0, 0, 0, 0, 0};
-    double expected = 0;
-    TEST_PROFILER profiler = {0};
+    TEST_PROFILER profiler = new_profiler(0, 1);
 
     while ((c = getopt_long(argc, argv, "w:a:b:v", pso_options, &longindex)) != -1) {
         switch (c) {
@@ -63,7 +60,7 @@ int main(int argc, char *argv[])
                 parameters.a2 = read_parameter_double(optarg, "a2");
                 break;
             case 't':
-                profiler.total_runs = read_parameter_size_t(optarg, "test runs");
+                profiler_update_runs(&profiler, read_parameter_size_t(optarg, "test runs"));
                 break;
             case 'e':
                 profiler.expected = read_parameter_double(optarg, "expected");
@@ -83,16 +80,16 @@ int main(int argc, char *argv[])
     }
 
     print_parameters(&parameters);
-
     printf("*********************************************************************\n");
     printf(" start search : \n\n");
-    for (profiler.completed = 0; i < profiler.total_runs; ++(profiler.completed)) {
+    for (profiler.completed = 0; profiler.completed < profiler.total_runs;) {
+        printf("\n completed = %lu", profiler.completed); fflush(stdout);
         PSO_status result = pso_search(fn, &parameters);
         update_pso_profiler(&profiler, &result);
         /* printf("   pso search (%lu) result = %lf, ", i, result.val_best); */
         /* print_double_vec("pos", result.pos_best, parameters.dimension); */
         if (verbose)
-            pso_print_result(i, result.pos_best, parameters.dimension, result.val_best);
+            pso_print_result(profiler.completed, result.pos_best, parameters.dimension, result.val_best);
         clear_status(&result, &parameters);
     }
 
