@@ -25,10 +25,10 @@ int main(int argc, char *argv[])
 {
     int id = -1;
     int p  = 0;
-    int c, longindex;
+    int c, longindex, verbose = 0;
     func_type fn = NULL;
-    size_t test_runs = 1;
     PSO_parameters parameters = {-1, 0};
+    TEST_PROFILER profiler = new_profiler(0, 1);
 
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &parameters.id);
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
                 fn = read_parameter_func_type(optarg, "function");
                 break;
             case 'd': /* dimension */
-                if (!parameters.ranges) {
+                if (!parameters.ranges){
                     parameters.dimension = read_parameter_size_t(optarg, "dimension");
                 }
                 break;
@@ -67,11 +67,16 @@ int main(int argc, char *argv[])
                 parameters.a2 = read_parameter_double(optarg, "a2");
                 break;
             case 't':
-                test_runs = read_parameter_size_t(optarg, "test runs");
+                profiler_update_runs(&profiler, read_parameter_size_t(optarg, "test runs"));
+                break;
+            case 'e':
+                profiler.expected = read_parameter_double(optarg, "expected");
+                break;
+            case 'v':
+                verbose = 1;
                 break;
             default:
                 fprintf(stderr, "Unrecognized flag %c ... abort\n", c);
-                MPI_Finalize();
                 exit(EXIT_FAILURE);
         }
     }
