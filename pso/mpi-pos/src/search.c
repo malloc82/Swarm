@@ -38,10 +38,11 @@ void update_status(PSO_status * swarm_status)
 
     size_t i;
     for (i = 0; i < count; ++i) {
-        if (agents[i].val_best <= swarm_status->val_best) {
+        if (agents[i].val_best <= agents[index_best].val_best) {
             index_best = i;
         }
     }
+
     if (index_best != swarm_status->index_best) {
         swarm_status->index_best = index_best;
         swarm_status->val_best   = agents[index_best].val_best;

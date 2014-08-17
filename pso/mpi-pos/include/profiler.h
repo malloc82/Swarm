@@ -21,6 +21,8 @@ typedef struct {
 
 TEST_PROFILER new_profiler(const double, const size_t);
 
+void profiler_update_runs(TEST_PROFILER *, const size_t);
+
 /* void update_profiler_rates(TEST_PROFILER *); */
 
 /* void update_profiler_success(TEST_PROFILER *); */

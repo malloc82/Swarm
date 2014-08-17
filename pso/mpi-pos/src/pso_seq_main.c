@@ -83,7 +83,6 @@ int main(int argc, char *argv[])
     printf("*********************************************************************\n");
     printf(" start search : \n\n");
     for (profiler.completed = 0; profiler.completed < profiler.total_runs;) {
-        printf("\n completed = %lu", profiler.completed); fflush(stdout);
         PSO_status result = pso_search(fn, &parameters);
         update_pso_profiler(&profiler, &result);
         /* printf("   pso search (%lu) result = %lf, ", i, result.val_best); */
