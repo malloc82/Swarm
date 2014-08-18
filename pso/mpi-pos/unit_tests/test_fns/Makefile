@@ -12,8 +12,10 @@ COMMON_SRC := $(SRCDIR)/functions.c $(SRCDIR)/utils.c $(SRCDIR)/io.c
 COMMON_OBJ := $(patsubst %.c,$(OBJDIR)/%.c.o,$(notdir $(COMMON_SRC)))
 DEBUG      := -g
 
-MPICC   := $(shell which mpicc) # /opt/local/bin/mpicc-openmpi-mp
-MPIRUN  := $(shell which mpirun)
+# MPIPATH := /usr/local/openmpi/1.6.5
+MPIPATH := /usr/local/openmpi/1.8.1
+MPICC   := $(MPIPATH)/bin/mpicc
+MPIRUN  := $(MPIPATH)/bin/mpirun
 CC      := $(shell $(MPICC) --showme:command)
 CFLAGS  := -Wall # $(shell $(MPICC) --showme:compile)
 LDFLAGS := -lm # $(shell $(MPICC) --showme:link)

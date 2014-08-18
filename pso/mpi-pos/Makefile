@@ -1,8 +1,10 @@
-
 SHELL   := /bin/bash
 CURDIR  := $(shell pwd)
-MPICC   := $(shell which mpicc) # /opt/local/bin/mpicc-openmpi-mp
-MPIRUN  := $(shell which mpirun)
+
+# MPIPATH := /usr/local/openmpi/1.6.5
+MPIPATH := /usr/local/openmpi/1.8.1
+MPICC   := $(MPIPATH)/bin/mpicc
+MPIRUN  := $(MPIPATH)/bin/mpirun
 CC      := $(shell $(MPICC) --showme:command)
 
 SRCDIR  := $(CURDIR)/src
