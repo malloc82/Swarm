@@ -30,7 +30,7 @@ void recver_fn(const int id, const int p)
     sleep(5);
 
     printf("\n (%d) : receiver wake up", id);
-    MPI_Iprobe(SENDER, CHANN, MPI_COMM_WORLD, &flag, &status);
+    printf("\n (%d) : probe return %d", id, MPI_Iprobe(SENDER, CHANN, MPI_COMM_WORLD, &flag, &status));
     fflush(stdout);
 
     if (flag) {
