@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [net.mikera/core.matrix "0.40.0"]
                  [net.mikera/vectorz     "0.50.0"]
+                 [net.mikera/vectorz-clj "0.34.0"]
                  [clatrix "0.5.0"]
                  [incanter/incanter-charts "1.5.6"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]]
