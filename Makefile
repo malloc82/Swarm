@@ -5,8 +5,8 @@ MPICC   := $(shell which mpicc) # /opt/local/bin/mpicc-openmpi-mp
 MPIRUN  := $(shell which mpirun)
 CC      := $(shell $(MPICC) --showme:command)
 
-SRCDIR  := $(CURDIR)/src
-TESTDIR := $(CURDIR)/test
+SRCDIR  := $(CURDIR)/src/c_mpi
+TESTDIR := $(SRCDIR)/test
 INCLUDE := -I $(CURDIR)/include
 BINDIR  := $(CURDIR)/bin
 

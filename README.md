@@ -1,4 +1,4 @@
-ParallelComputations
+# Swarm
 ====================
 
-Projects for parallel computations
+## Particle Swarm Optimization
