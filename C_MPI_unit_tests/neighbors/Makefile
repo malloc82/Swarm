@@ -1,7 +1,7 @@
 SHELL   := /bin/bash
 CURDIR  := $(shell pwd)
 
-SRCDIR  := $(CURDIR)/../../src
+SRCDIR  := $(CURDIR)/../../src/c_mpi
 TESTDIR := $(CURDIR)
 INCLUDE := -I $(CURDIR)/../../include
 OBJDIR  := $(CURDIR)/obj
