@@ -13,7 +13,7 @@
 (mat/set-current-implementation :vectorz)
 
 (defn seed-agents
-  "Seeding agents' initial positions"
+  "Seeding agents' initial positions, based on range and dimension number"
   [agent-count search-ranges]
   (let [[dim _] (mat/shape search-ranges)
         m       (Matrix/create dim agent-count)]
@@ -30,6 +30,14 @@
         (recur (unchecked-inc r))))
     m))
 
+(defn update-pos
+  "Update swarm agents' position"
+  [v]
+  (let [[_ agent-count] (mat/shape v)
+        r_a1 (Matrix/createRandom 1 agent-count)
+        r_a2 (Matrix/createRandom 1 agent-count)]
+    ))
+
 (defn search
   "Particle swarm search:
   update scheme:
@@ -44,11 +52,14 @@
                   search-range (mat/matrix :vectorz [[-10 10]])
                   debug        false}}]
 
-  (let [[row col] (mat/shape search-range)]
+  (let [[row col] (mat/shape search-range)
+        init-pos  (seed-agents agent-count search-ranges)
+        cores     (.availableProcessors (Runtime/getRuntime))]
     (if debug
-    (pprint {:count agent-count
-             :range search-range
-             :dim   row
-             :col   col})))
+      (pprint {:count agent-count
+               :range search-range
+               :dim   row
+               :col   col}))
+    )
 
   )
