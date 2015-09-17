@@ -10,6 +10,7 @@
                  [net.mikera/vectorz-clj "0.34.0"]
                  [clatrix "0.5.0"]
                  [incanter/incanter-charts "1.5.6"]
+                 [incanter/incanter-core   "1.5.6"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]]
   ;; :jvm-opts ^:replace ["-server" "-XX:+UseCompressedOops" "-XX:+AggressiveOpts"
   ;;                      "-XX:+UnlockCommercialFeatures"
