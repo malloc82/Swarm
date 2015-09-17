@@ -2,9 +2,9 @@
 SHELL   := /bin/bash
 CURDIR  := $(shell pwd)
 
-SRCDIR  := $(CURDIR)/../../src/c_mpi
+SRCDIR  := $(CURDIR)/../../c_mpi
 TESTDIR := $(CURDIR)
-INCLUDE := -I $(CURDIR)/../../include
+INCLUDE := -I $(CURDIR)/../../../include
 OBJDIR  := $(CURDIR)/obj
 BINDIR  := $(CURDIR)/bin
 
